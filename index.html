@@ -188,6 +188,13 @@ tw-link::after { content: ""; }
 
 tw-link.visited, tw-link.visited:hover {
   color: #4a2f20 !important;
+}
+
+tw-link.visited, 
+tw-link.visited:hover,
+a.internalLink.visited,
+a.internalLink.visited:hover {
+  color: #4a2f20 !important;
 }</style><script role="script" id="twine-user-script" type="text/twine-javascript">(function () {
   const TAG_TO_CLASS = {
     station: "bg-station",
@@ -231,10 +238,7 @@ tw-link.visited, tw-link.visited:hover {
 (set: $eff to 2)
 (set: $path to &quot;&quot;)
 (set: $ended to false)
-
 (set: $harm to false)
-
-;; time pressure system
 (set: $time to 0)
 (set: $timeLimit to 6)
 
@@ -785,53 +789,45 @@ tw-link.visited, tw-link.visited:hover {
 
     [[Restart-&gt;Start]]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="26" name="Result" tags="" position="1650,1600" size="100,100">Result
-(set: $ended to true)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="26" name="Result" tags="" position="1650,1600" size="100,100">(set: $ended to true)
 
-/* Nursing weights */
 (set: $wSafety to 0.45)
 (set: $wTrust to 0.35)
 (set: $wEff to 0.20)
 
-/* Weighted score (0–5 scale) */
 (set: $score to ($safety * $wSafety) + ($trust * $wTrust) + ($eff * $wEff))
 
-/* Safety helpers */
+;; helper flags
 (set: $overTime to ($time &gt;= $timeLimit))
-
-/* If you haven&#39;t created it yet, default it */
 (if: (not: (isset: $nearMiss)))[(set: $nearMiss to false)]
 
-/* HARD FAIL: harm always End3 */
+;; HARD FAIL
 (if: $harm is true)[
   (goto: &quot;End3&quot;)
 ]
 (else:)[
 
-  /* End1: best outcome (safe + trusted) */
+  ;; End1 = safe + trusted (best)
   (if: $score &gt;= 4.2 and $trust &gt;= 4 and $safety &gt;= 4)[
     (goto: &quot;End1&quot;)
   ]
 
-  /* End2: fast under pressure OR recovered a near-miss, still safe enough */
-  (else-if:
-    (
-      ($nearMiss is true and $safety &gt;= 3)
-      or
-      ($eff &gt;= 4 and $safety &gt;= 3)
-      or
-      ($overTime is true and $eff &gt;= 3 and $safety &gt;= 3)
-    )
-  )[
+  ;; End2 = safe-enough AND efficient under pressure
+  ;; - You can get it via: efficiency, overtime, OR any “near-miss handled” moment
+  (else-if: $safety &gt;= 3 and (
+      $eff &gt;= 4
+      or $overTime is true
+      or $nearMiss is true
+    ))[
     (goto: &quot;End2&quot;)
   ]
 
-  /* Otherwise: learning moment */
+  ;; End3 = learning moment
   (else:)[
     (goto: &quot;End3&quot;)
   ]
 ]</tw-passagedata><tw-passagedata pid="27" name="A2c" tags="station" position="975,850" size="100,100">A2c
-(set: $path to $path + &quot;A2b &quot;)
+(set: $path to $path + &quot;A2c &quot;)
 (set: $time to $time + 1)
 
 &lt;div class=&quot;hud&quot;&gt;
