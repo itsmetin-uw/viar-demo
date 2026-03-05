@@ -14,6 +14,7 @@
    - Background controlled by Story JavaScript (body.bg-*)
    - Centered glass UI
    - High readability
+   - Tight paragraph spacing + no mystery gaps
    ========================= */
 
 html, body {
@@ -38,7 +39,7 @@ body {
   to   { background-size: 106% auto; }
 }
 
-/* Soft dark tint so UI reads */
+/* Soft tint so UI reads */
 body::before {
   content: "";
   position: fixed;
@@ -116,6 +117,24 @@ tw-passage {
   animation: fadeIn 220ms ease-out;
 }
 
+/* IMPORTANT: kill Harlowe auto <p> gaps that show up ABOVE your HUD */
+tw-passage > p {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Hide truly empty auto-paragraphs */
+tw-passage > p:empty {
+  display: none !important;
+}
+
+/* Hide Harlowe passage title like "Start" if it appears */
+tw-passage > h1 {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -127,7 +146,7 @@ tw-passage {
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
-  margin-bottom: 12px;
+  margin: 0 0 10px 0;
 
   color: rgba(25, 20, 18, 0.88);
 }
@@ -149,41 +168,43 @@ tw-passage {
 .content {
   max-width: 680px;
   font-size: 1.05em;
-  line-height: 1.45;
+
+  /* tighter line spacing (sentence spacing) */
+  line-height: 1.30;
 }
 
-/* Remove the extra top margin from the first paragraph in your content */
-.content p:first-child {
-  margin-top: 0;
-}
+/* =========================
+   Tighter paragraph spacing
+   ========================= */
 
-/* Paragraph spacing inside your story content only */
+/* In case Harlowe wraps plain text into <p> inside .content */
 .content p {
-  margin: 0 0 6px 0;
+  margin: 0 0 4px 0;   /* smaller than your old 6px */
 }
 .content p:last-child {
   margin-bottom: 0;
 }
-
-/* If Twine is inserting empty paragraphs, hide them */
+.content p:first-child {
+  margin-top: 0;
+}
 .content p:empty {
   display: none;
 }
 
-/* Hide Harlowe passage titles like "Start" */
-tw-passage > h1 {
-  display: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
+/* Also tighten margins for common block elements if you use them */
+.content br { line-height: 1.0; }
+.content b { font-weight: 750; }
 
-/* Buttons */
+/* =========================
+   Buttons / links
+   ========================= */
+
 tw-link, a.internalLink {
   display: block;
   width: fit-content;
   min-width: 280px;
 
-  margin: 10px 0 0 0;
+  margin: 8px 0 0 0;   /* slightly tighter vertical spacing */
   padding: 10px 14px;
 
   border-radius: 14px;
@@ -207,6 +228,7 @@ tw-link:active, a.internalLink:active {
   transform: translateY(1px) scale(0.99);
 }
 
+/* Prevent the little arrow/marker some formats add */
 tw-link::after { content: ""; }
 
 /* Prevent visited links turning purple */
