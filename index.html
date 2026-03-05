@@ -154,10 +154,15 @@ tw-passage {
 
 /* Paragraph spacing inside your story content only */
 .content p {
-  margin: 0 0 12px 0;
+  margin: 0 0 6px 0;
 }
 .content p:last-child {
   margin-bottom: 0;
+}
+
+/* If Twine is inserting empty paragraphs, hide them */
+.content p:empty {
+  display: none;
 }
 
 /* Buttons */
@@ -237,8 +242,7 @@ a.internalLink.visited:hover {
   const root = document.querySelector("tw-story") || document.body;
   const obs = new MutationObserver(() => applyBackgroundFromPassage());
   obs.observe(root, { childList: true, subtree: true });
-})();</script><tw-tag name="patientroom" color="green"></tw-tag><tw-tag name="medroom" color="orange"></tw-tag><tw-tag name="hallway" color="orange"></tw-tag><tw-tag name="ending" color="blue"></tw-tag><tw-tag name="station" color="orange"></tw-tag><tw-passagedata pid="1" name="Start" tags="station" position="1225,600" size="100,100">Start
-(set: $safety to 0)
+})();</script><tw-tag name="patientroom" color="green"></tw-tag><tw-tag name="medroom" color="orange"></tw-tag><tw-tag name="hallway" color="orange"></tw-tag><tw-tag name="ending" color="blue"></tw-tag><tw-tag name="station" color="orange"></tw-tag><tw-passagedata pid="1" name="Start" tags="station" position="1225,600" size="100,100">(set: $safety to 0)
 (set: $trust to 0)
 (set: $eff to 0)
 (set: $path to &quot;&quot;)
@@ -262,8 +266,7 @@ a.internalLink.visited:hover {
 
     [[Start Shift-&gt;A1]]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="2" name="A1" tags="station" position="1225,725" size="100,100">A1
-(set: $path to $path + &quot;A1 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="2" name="A1" tags="station" position="1225,725" size="100,100">(set: $path to $path + &quot;A1 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A1&lt;/div&gt;
@@ -281,8 +284,7 @@ a.internalLink.visited:hover {
     [[Check supplies/scanner-&gt;C1]]
     [[Continue-&gt;A2c]]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="3" name="A2" tags="medroom" position="1100,850" size="100,100">A2
-(set: $path to $path + &quot;A2 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="3" name="A2" tags="medroom" position="1100,850" size="100,100">(set: $path to $path + &quot;A2 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A2&lt;/div&gt;
@@ -309,8 +311,7 @@ a.internalLink.visited:hover {
       (goto: &quot;A2b&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="4" name="B1" tags="patientroom" position="1225,850" size="100,100">B1
-(set: $path to $path + &quot;B1 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="4" name="B1" tags="patientroom" position="1225,850" size="100,100">(set: $path to $path + &quot;B1 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: B1&lt;/div&gt;
@@ -338,8 +339,7 @@ a.internalLink.visited:hover {
       (goto: &quot;B3&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="5" name="C1" tags="medroom" position="1350,850" size="100,100">C1
-(set: $path to $path + &quot;C1 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="5" name="C1" tags="medroom" position="1350,850" size="100,100">(set: $path to $path + &quot;C1 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: C1&lt;/div&gt;
@@ -367,8 +367,7 @@ a.internalLink.visited:hover {
       (goto: &quot;C1b&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="6" name="A2b" tags="medroom" position="1100,975" size="100,100">A2b
-(set: $path to $path + &quot;A2b &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="6" name="A2b" tags="medroom" position="1100,975" size="100,100">(set: $path to $path + &quot;A2b &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A2b&lt;/div&gt;
@@ -390,8 +389,7 @@ a.internalLink.visited:hover {
       (goto: &quot;A3&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="7" name="C1b" tags="medroom" position="1350,975" size="100,100">C1b
-(set: $path to $path + &quot;C1b &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="7" name="C1b" tags="medroom" position="1350,975" size="100,100">(set: $path to $path + &quot;C1b &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: C1b&lt;/div&gt;
@@ -414,8 +412,7 @@ a.internalLink.visited:hover {
       (goto: &quot;C2&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="8" name="A3" tags="patientroom" position="1100,1100" size="100,100">A3
-(set: $path to $path + &quot;A3 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="8" name="A3" tags="patientroom" position="1100,1100" size="100,100">(set: $path to $path + &quot;A3 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A3&lt;/div&gt;
@@ -443,8 +440,7 @@ a.internalLink.visited:hover {
       (goto: &quot;A4b&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="9" name="B2" tags="patientroom" position="1225,975" size="100,100">B2
-(set: $path to $path + &quot;B2 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="9" name="B2" tags="patientroom" position="1225,975" size="100,100">(set: $path to $path + &quot;B2 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: B2&lt;/div&gt;
@@ -469,8 +465,7 @@ a.internalLink.visited:hover {
       (goto: &quot;B4&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="10" name="B3" tags="patientroom" position="1225,1100" size="100,100">B3
-(set: $path to $path + &quot;B3 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="10" name="B3" tags="patientroom" position="1225,1100" size="100,100">(set: $path to $path + &quot;B3 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: B3&lt;/div&gt;
@@ -490,8 +485,7 @@ a.internalLink.visited:hover {
       (goto: &quot;A4&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="11" name="A4" tags="medroom" position="1100,1225" size="100,100">A4
-(set: $path to $path + &quot;A4 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="11" name="A4" tags="medroom" position="1100,1225" size="100,100">(set: $path to $path + &quot;A4 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A4&lt;/div&gt;
@@ -529,8 +523,7 @@ a.internalLink.visited:hover {
       (goto: &quot;D1&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="13" name="D1" tags="hallway" position="1475,850" size="100,100">D1
-(set: $path to $path + &quot;D1 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="13" name="D1" tags="hallway" position="1475,850" size="100,100">(set: $path to $path + &quot;D1 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: D1&lt;/div&gt;
@@ -554,8 +547,7 @@ a.internalLink.visited:hover {
       (goto: &quot;B6&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="14" name="A5" tags="medroom" position="1100,1475" size="100,100">A5
-(set: $path to $path + &quot;A5 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="14" name="A5" tags="medroom" position="1100,1475" size="100,100">(set: $path to $path + &quot;A5 &quot;)
 (set: $time to $time + 1)
 
 &lt;div class=&quot;hud&quot;&gt;
@@ -602,8 +594,7 @@ a.internalLink.visited:hover {
       (goto: &quot;B6&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="15" name="A6" tags="hallway" position="1100,1600" size="100,100">A6
-(set: $path to $path + &quot;A6 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="15" name="A6" tags="hallway" position="1100,1600" size="100,100">(set: $path to $path + &quot;A6 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A6&lt;/div&gt;
@@ -631,8 +622,7 @@ a.internalLink.visited:hover {
       (goto: &quot;A6b&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="16" name="A7" tags="hallway" position="1225,1600" size="100,100">A7
-(set: $path to $path + &quot;A7 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="16" name="A7" tags="hallway" position="1225,1600" size="100,100">(set: $path to $path + &quot;A7 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A7&lt;/div&gt;
@@ -663,8 +653,7 @@ a.internalLink.visited:hover {
       (goto: &quot;B6&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="17" name="A8" tags="patientroom" position="1350,1600" size="100,100">A8
-(set: $path to $path + &quot;A8 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="17" name="A8" tags="patientroom" position="1350,1600" size="100,100">(set: $path to $path + &quot;A8 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A8&lt;/div&gt;
@@ -700,8 +689,7 @@ a.internalLink.visited:hover {
       (goto: &quot;B7&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="18" name="A9" tags="patientroom" position="1475,1600" size="100,100">A9
-(set: $path to $path + &quot;A9 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="18" name="A9" tags="patientroom" position="1475,1600" size="100,100">(set: $path to $path + &quot;A9 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A9&lt;/div&gt;
@@ -714,8 +702,7 @@ a.internalLink.visited:hover {
 
     (goto: &quot;Result&quot;)
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="19" name="C2" tags="medroom" position="1350,1100" size="100,100">C2
-(set: $path to $path + &quot;C2 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="19" name="C2" tags="medroom" position="1350,1100" size="100,100">(set: $path to $path + &quot;C2 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: C2&lt;/div&gt;
@@ -739,8 +726,7 @@ a.internalLink.visited:hover {
       (goto: &quot;A5&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="20" name="B4" tags="hallway" position="1225,1225" size="100,100">B4
-(set: $path to $path + &quot;B4 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="20" name="B4" tags="hallway" position="1225,1225" size="100,100">(set: $path to $path + &quot;B4 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: B4&lt;/div&gt;
@@ -763,8 +749,7 @@ a.internalLink.visited:hover {
       (goto: &quot;B6&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="21" name="B6" tags="hallway" position="1225,1350" size="100,100">B6
-(set: $path to $path + &quot;B6 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="21" name="B6" tags="hallway" position="1225,1350" size="100,100">(set: $path to $path + &quot;B6 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: B6&lt;/div&gt;
@@ -785,8 +770,7 @@ a.internalLink.visited:hover {
       (goto: &quot;B8&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="22" name="B7" tags="patientroom" position="1350,1350" size="100,100">B7
-(set: $path to $path + &quot;B7 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="22" name="B7" tags="patientroom" position="1350,1350" size="100,100">(set: $path to $path + &quot;B7 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: B7&lt;/div&gt;
@@ -914,8 +898,7 @@ a.internalLink.visited:hover {
 
     &lt;p&gt;[[Restart-&gt;Start]]&lt;/p&gt;
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="26" name="Result" tags="" position="1650,1600" size="100,100">Result
-(set: $ended to true)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="26" name="Result" tags="" position="1650,1600" size="100,100">(set: $ended to true)
 
 (set: $wSafety to 0.45)
 (set: $wTrust to 0.35)
@@ -940,8 +923,7 @@ a.internalLink.visited:hover {
 ]
 (else:)[
   (goto: &quot;End3&quot;)
-]</tw-passagedata><tw-passagedata pid="27" name="A2c" tags="station" position="975,850" size="100,100">A2c
-(set: $path to $path + &quot;A2c &quot;)
+]</tw-passagedata><tw-passagedata pid="27" name="A2c" tags="station" position="975,850" size="100,100">(set: $path to $path + &quot;A2c &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A2c&lt;/div&gt;
@@ -971,8 +953,7 @@ a.internalLink.visited:hover {
       (goto: &quot;A5&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="28" name="A5b" tags="station" position="1350,1475" size="100,100">A5b
-(set: $path to $path + &quot;A5b &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="28" name="A5b" tags="station" position="1350,1475" size="100,100">(set: $path to $path + &quot;A5b &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A5b&lt;/div&gt;
@@ -1004,8 +985,7 @@ a.internalLink.visited:hover {
       (goto: &quot;B6&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="29" name="A6b" tags="station" position="1100,1725" size="100,100">A6b
-(set: $path to $path + &quot;A6b &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="29" name="A6b" tags="station" position="1100,1725" size="100,100">(set: $path to $path + &quot;A6b &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A6b&lt;/div&gt;
@@ -1029,8 +1009,7 @@ a.internalLink.visited:hover {
       (goto: &quot;A7&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="30" name="A7b" tags="station" position="1225,1725" size="100,100">A7b
-(set: $path to $path + &quot;A7b &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="30" name="A7b" tags="station" position="1225,1725" size="100,100">(set: $path to $path + &quot;A7b &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A7b&lt;/div&gt;
@@ -1062,8 +1041,7 @@ a.internalLink.visited:hover {
       (goto: &quot;B6&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="31" name="A8b" tags="patientroom" position="1350,1725" size="100,100">A8b
-(set: $path to $path + &quot;A8b &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="31" name="A8b" tags="patientroom" position="1350,1725" size="100,100">(set: $path to $path + &quot;A8b &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A8b&lt;/div&gt;
@@ -1093,8 +1071,7 @@ a.internalLink.visited:hover {
       (goto: &quot;A9&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="32" name="B8" tags="patientroom" position="1475,1350" size="100,100">B8
-(set: $path to $path + &quot;B8 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="32" name="B8" tags="patientroom" position="1475,1350" size="100,100">(set: $path to $path + &quot;B8 &quot;)
 (set: $time to (min: $timeLimit, $time + 1))
 (set: $nearMiss to true)
 
@@ -1120,8 +1097,7 @@ a.internalLink.visited:hover {
       (goto: &quot;Result&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="33" name="A5a" tags="medroom" position="1225,1475" size="100,100">A5a
-(set: $path to $path + &quot;A5a &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="33" name="A5a" tags="medroom" position="1225,1475" size="100,100">(set: $path to $path + &quot;A5a &quot;)
 (set: $time to $time + 1)
 
 &lt;div class=&quot;hud&quot;&gt;
