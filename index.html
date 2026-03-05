@@ -184,7 +184,11 @@ tw-link:active, a.internalLink:active {
   transform: translateY(1px) scale(0.99);
 }
 
-tw-link::after { content: ""; }</style><script role="script" id="twine-user-script" type="text/twine-javascript">(function () {
+tw-link::after { content: ""; }
+
+tw-link.visited, tw-link.visited:hover {
+  color: #4a2f20 !important;
+}</style><script role="script" id="twine-user-script" type="text/twine-javascript">(function () {
   const TAG_TO_CLASS = {
     station: "bg-station",
     patientroom: "bg-patientroom",
@@ -221,19 +225,16 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
   // Re-run whenever Twine swaps passages
   const obs = new MutationObserver(() => applyBackgroundFromPassage());
   obs.observe(document.body, { childList: true, subtree: true });
-})();</script><tw-tag name="patientroom" color="green"></tw-tag><tw-tag name="medroom" color="orange"></tw-tag><tw-tag name="hallway" color="orange"></tw-tag><tw-tag name="ending" color="blue"></tw-tag><tw-tag name="station" color="orange"></tw-tag><tw-passagedata pid="1" name="Start" tags="station" position="1225,600" size="100,100">Start
-
+})();</script><tw-tag name="patientroom" color="green"></tw-tag><tw-tag name="medroom" color="orange"></tw-tag><tw-tag name="hallway" color="orange"></tw-tag><tw-tag name="ending" color="blue"></tw-tag><tw-tag name="station" color="orange"></tw-tag><tw-passagedata pid="1" name="Start" tags="station" position="1225,600" size="100,100"> Start
 (set: $safety to 2)
 (set: $trust to 2)
 (set: $eff to 2)
 (set: $path to &quot;&quot;)
 (set: $ended to false)
 
-/* grading gates */
-(set: $safetyGate to false)
 (set: $harm to false)
 
-/* NEW: time pressure (lower = faster) */
+;; time pressure system
 (set: $time to 0)
 (set: $timeLimit to 6)
 
@@ -524,23 +525,20 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
       (set: $safetyGate to true)
       (set: $safety to (min: 5, $safety + 2))
       (set: $eff to (max: 0, $eff - 1))
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit,$time + 1))
     ]
-
     (link-goto: &quot;Ask another nurse to confirm (team check)&quot;, &quot;A5b&quot;)[
       (set: $safetyGate to true)
       (set: $safety to (min: 5, $safety + 1))
       (set: $trust to (min: 5, $trust + 1))
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit,$time + 1))
     ]
-
     (link-goto: &quot;Call pharmacy/provider (fast escalation)&quot;, &quot;A7&quot;)[
       (set: $safetyGate to true)
       (set: $safety to (min: 5, $safety + 1))
       (set: $eff to (min: 5, $eff + 1))
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit,$time + 1))
     ]
-
     (link-goto: &quot;Override and give (fastest, risky)&quot;, &quot;B6&quot;)[
       (set: $harm to true)
       (set: $eff to (min: 5, $eff + 2))
@@ -561,17 +559,15 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
     You find a near-miss risk (similar-name med / unclear allergy note).
 
     (link-goto: &quot;Hold med + page provider&quot;, &quot;A7&quot;)[
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit,$time + 1))
     ]
-
     (link-goto: &quot;Escalate to charge nurse&quot;, &quot;A7&quot;)[
       (set: $trust to (min: 5, $trust + 1))
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit,$time + 1))
     ]
-
     (link-goto: &quot;Call pharmacy for clarification (read-back)&quot;, &quot;A6b&quot;)[
       (set: $safety to (min: 5, $safety + 1))
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit,$time + 1))
     ]
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="16" name="A7" tags="hallway" position="1225,1600" size="100,100">A7
@@ -589,18 +585,16 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
     (link-goto: &quot;Advocate: safety concern, request corrected order&quot;, &quot;A8&quot;)[
       (set: $safety to (min: 5, $safety + 1))
       (set: $trust to (min: 5, $trust + 1))
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit,$time + 1))
     ]
-
     (link-goto: &quot;Use SBAR vs cave under pressure (communication choice)&quot;, &quot;A7b&quot;)[
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit,$time + 1))
     ]
-
     (link-goto: &quot;Accept and proceed anyway&quot;, &quot;B6&quot;)[
       (set: $eff to (min: 5, $eff + 1))
       (set: $safety to (max: 0, $safety - 1))
       (set: $harm to true)
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit,$time + 1))
     ]
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="17" name="A8" tags="patientroom" position="1350,1600" size="100,100">A8
@@ -608,7 +602,7 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A8&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
@@ -617,43 +611,44 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
 
     (link: &quot;Explain the safety check simply&quot;)[
       (set: $trust to (min: 5, $trust + 2))
+      (set: $time to (min: $timeLimit, $time + 1))
       (goto: &quot;A9&quot;)
     ]
 
     (link: &quot;Do a quick bedside reassess + explain next steps (more thorough)&quot;)[
       (set: $trust to (min: 5, $trust + 1))
       (set: $safety to (min: 5, $safety + 1))
+      (set: $time to (min: $timeLimit, $time + 2))
       (goto: &quot;A8b&quot;)
     ]
 
     (link: &quot;Avoid explanation and leave&quot;)[
       (set: $trust to (max: 0, $trust - 2))
+      (set: $eff to (min: 5, $eff + 1))
+      (set: $time to (min: $timeLimit, $time + 0))
       (goto: &quot;B7&quot;)
     ]
 
     (link: &quot;Blame the system&quot;)[
       (set: $trust to (max: 0, $trust - 1))
+      (set: $eff to (min: 5, $eff + 1))
+      (set: $time to (min: $timeLimit, $time + 0))
       (goto: &quot;B7&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="18" name="A9" tags="patientroom" position="1475,1600" size="100,100">:: A9
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="18" name="A9" tags="patientroom" position="1475,1600" size="100,100">A9
 (set: $path to $path + &quot;A9 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A9&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
     Correct plan confirmed. You administer safely and reassess. Pain improves.
 
-    (if: $harm is true)[
-      (link: &quot;Continue monitoring&quot;)[(goto: &quot;B8&quot;)]
-    ]
-    (else:)[
-      [[Wrap up and log results-&gt;Result]]
-    ]
+    (goto: &quot;Result&quot;)
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="19" name="C2" tags="medroom" position="1350,1100" size="100,100">(set: $path to $path + &quot;C2 &quot;)
 
@@ -736,8 +731,7 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
       (goto: &quot;A9&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="23" name="End1" tags="ending station" position="525,1500" size="100,100">:: End1 [nobr]
-(set: $ended to true)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="23" name="End1" tags="ending station" position="525,1500" size="100,100">(set: $ended to true)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: End1&lt;/div&gt;
@@ -755,8 +749,7 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
 
     [[Restart-&gt;Start]]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="24" name="End3" tags="ending station" position="900,1500" size="100,100">:: End3 [nobr]
-(set: $ended to true)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="24" name="End3" tags="ending station" position="900,1500" size="100,100">(set: $ended to true)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: End3&lt;/div&gt;
@@ -792,7 +785,7 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
 
     [[Restart-&gt;Start]]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="26" name="Result" tags="" position="1650,1600" size="100,100">:: Result
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="26" name="Result" tags="" position="1650,1600" size="100,100">Result
 (set: $ended to true)
 
 /* Nursing weights */
@@ -800,18 +793,40 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
 (set: $wTrust to 0.35)
 (set: $wEff to 0.20)
 
+/* Weighted score (0–5 scale) */
 (set: $score to ($safety * $wSafety) + ($trust * $wTrust) + ($eff * $wEff))
 
+/* Safety helpers */
+(set: $overTime to ($time &gt;= $timeLimit))
+
+/* If you haven&#39;t created it yet, default it */
+(if: (not: (isset: $nearMiss)))[(set: $nearMiss to false)]
+
+/* HARD FAIL: harm always End3 */
 (if: $harm is true)[
   (goto: &quot;End3&quot;)
 ]
 (else:)[
+
+  /* End1: best outcome (safe + trusted) */
   (if: $score &gt;= 4.2 and $trust &gt;= 4 and $safety &gt;= 4)[
     (goto: &quot;End1&quot;)
   ]
-  (else-if: ($eff &gt;= 4) and ($safety &gt;= 3) and ($score &gt;= 3.3))[
+
+  /* End2: fast under pressure OR recovered a near-miss, still safe enough */
+  (else-if:
+    (
+      ($nearMiss is true and $safety &gt;= 3)
+      or
+      ($eff &gt;= 4 and $safety &gt;= 3)
+      or
+      ($overTime is true and $eff &gt;= 3 and $safety &gt;= 3)
+    )
+  )[
     (goto: &quot;End2&quot;)
   ]
+
+  /* Otherwise: learning moment */
   (else:)[
     (goto: &quot;End3&quot;)
   ]
@@ -830,19 +845,17 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
 
     (link-goto: &quot;Explain calmly + set expectations (build trust)&quot;, &quot;A5&quot;)[
       (set: $trust to (min: 5, $trust + 1))
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit,$time + 1))
     ]
-
     (link-goto: &quot;Short answer, keep moving (save time)&quot;, &quot;A5&quot;)[
       (set: $eff to (min: 5, $eff + 1))
     ]
-
     (link-goto: &quot;Promise fast relief (risk later pressure)&quot;, &quot;A5&quot;)[
       (set: $eff to (min: 5, $eff + 1))
       (set: $trust to (max: 0, $trust - 1))
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="28" name="A5b" tags="" position="1225,1475" size="100,100">A5b
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="28" name="A5b" tags="station" position="1225,1475" size="100,100">:: A5b
 (set: $path to $path + &quot;A5b &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
@@ -857,19 +870,18 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
     (link-goto: &quot;Do full MAR + allergy history review (slow, strong safety)&quot;, &quot;A6&quot;)[
       (set: $safety to (min: 5, $safety + 1))
       (set: $eff to (max: 0, $eff - 1))
-      (set: $time to $time + 2)
+      (set: $time to (min: $timeLimit, $time + 2))
     ]
-
     (link-goto: &quot;Quick verify: wristband + last admin record (balanced)&quot;, &quot;A6&quot;)[
       (set: $safety to (min: 5, $safety + 1))
       (set: $eff to (min: 5, $eff + 1))
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit, $time + 1))
     ]
-
     (link-goto: &quot;Skip chart digging (move fast)&quot;, &quot;B6&quot;)[
       (set: $eff to (min: 5, $eff + 2))
       (set: $safety to (max: 0, $safety - 2))
       (set: $harm to true)
+      (set: $time to (min: $timeLimit, $time + 0))
     ]
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="29" name="A6b" tags="station" position="1100,1725" size="100,100">A6b
@@ -887,9 +899,8 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
     (link-goto: &quot;Do read-back + clarify reaction (best practice)&quot;, &quot;A7&quot;)[
       (set: $safety to (min: 5, $safety + 1))
       (set: $trust to (min: 5, $trust + 1))
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit,$time + 1))
     ]
-
     (link-goto: &quot;Give quick answer, no read-back (faster)&quot;, &quot;A7&quot;)[
       (set: $eff to (min: 5, $eff + 1))
       (set: $safety to (max: 0, $safety - 1))
@@ -910,15 +921,13 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
     (link-goto: &quot;Use SBAR (clear + fast communication)&quot;, &quot;A8b&quot;)[
       (set: $trust to (min: 5, $trust + 1))
       (set: $eff to (min: 5, $eff + 1))
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit,$time + 1))
     ]
-
     (link-goto: &quot;Hold firm: no admin until corrected order&quot;, &quot;A8b&quot;)[
       (set: $safety to (min: 5, $safety + 1))
       (set: $eff to (max: 0, $eff - 1))
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit,$time + 1))
     ]
-
     (link-goto: &quot;Fine—admin now (avoid conflict)&quot;, &quot;B6&quot;)[
       (set: $eff to (min: 5, $eff + 1))
       (set: $safety to (max: 0, $safety - 2))
@@ -940,22 +949,21 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
     (link-goto: &quot;Reassess pain + educate + document (trust-heavy)&quot;, &quot;A9&quot;)[
       (set: $trust to (min: 5, $trust + 1))
       (set: $safety to (min: 5, $safety + 1))
-      (set: $time to $time + 2)
+      (set: $time to (min: $timeLimit,$time + 2))
     ]
-
     (link-goto: &quot;Quick reassess + document essentials (balanced)&quot;, &quot;A9&quot;)[
       (set: $eff to (min: 5, $eff + 1))
-      (set: $time to $time + 1)
+      (set: $time to (min: $timeLimit,$time + 1))
     ]
-
     (link-goto: &quot;Skip reassessment (save time)&quot;, &quot;A9&quot;)[
       (set: $eff to (min: 5, $eff + 2))
       (set: $safety to (max: 0, $safety - 1))
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="32" name="B8" tags="" position="1475,1350" size="100,100">B8
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="32" name="B8" tags="patientroom" position="1475,1350" size="100,100">:: B8
 (set: $path to $path + &quot;B8 &quot;)
-(set: $time to $time + 1)
+(set: $time to (min: $timeLimit, $time + 1))
+(set: $nearMiss to true)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: B8&lt;/div&gt;
@@ -966,14 +974,15 @@ tw-link::after { content: ""; }</style><script role="script" id="twine-user-scri
   &lt;div class=&quot;content&quot;&gt;
     You notice early signs of a reaction. This is your chance to respond.
 
-    (link-goto: &quot;Stop med + call rapid response immediately&quot;, &quot;End3&quot;)[
+    (link-goto: &quot;Stop med + call rapid response immediately&quot;, &quot;Result&quot;)[
       (set: $safety to (min: 5, $safety + 1))
       (set: $trust to (max: 0, $trust - 1))
     ]
 
-    (link-goto: &quot;Notify provider + implement protocol quickly (fast recovery)&quot;, &quot;End3&quot;)[
+    (link-goto: &quot;Notify provider + implement protocol quickly (fast recovery)&quot;, &quot;Result&quot;)[
       (set: $eff to (min: 5, $eff + 1))
       (set: $safety to (max: 0, $safety - 1))
+      (set: $trust to (max: 0, $trust - 1))
     ]
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata></tw-storydata>
