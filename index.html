@@ -10,9 +10,8 @@
 <body>
 <tw-story><noscript><tw-noscript>JavaScript needs to be enabled to play Story Format: Harlowe 3.</tw-noscript></noscript></tw-story>
 <tw-storydata name="Story Format: Harlowe 3" startnode="1" creator="Twine" creator-version="2.11.1" format="Harlowe" format-version="3.3.9" ifid="A0D9C9A0-5B57-4107-BC39-02B5C0358017" options="" tags="" zoom="1" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css">/* =========================
-   ViaR Twine Stylesheet (FINAL / CLEAN)
-   - No portraits
-   - Tag-based background images
+   ViaR Twine Stylesheet (CLEAN / JS-BG VERSION)
+   - Background controlled by Story JavaScript (body.bg-*)
    - Centered glass UI
    - High readability
    ========================= */
@@ -49,40 +48,39 @@ body::before {
 }
 
 /* =========================================================
-   TAG-BASED BACKGROUNDS
-   NOTE: Using absolute paths for GitHub Pages:
-   https://itsmetin-uw.github.io/viar-demo/...
+   BACKGROUNDS (JS adds these classes to <body>)
+   GitHub Pages path: /viar-demo/...
    ========================================================= */
 
-body:has(tw-passage[tags~="station"]) {
+body.bg-station {
   background-color: #fff3e6;
   background-image:
     url("/viar-demo/images/bg-station.jpg"),
     linear-gradient(#fff3e6, #ffe8d1);
 }
 
-body:has(tw-passage[tags~="patientroom"]) {
+body.bg-patientroom {
   background-color: #f7fbff;
   background-image:
     url("/viar-demo/images/bg-patientroom.jpg"),
     linear-gradient(#f7fbff, #eaf3ff);
 }
 
-body:has(tw-passage[tags~="medroom"]) {
+body.bg-medroom {
   background-color: #f5fff6;
   background-image:
     url("/viar-demo/images/bg-medroom.jpg"),
     linear-gradient(#f5fff6, #e9ffe9);
 }
 
-body:has(tw-passage[tags~="hallway"]) {
+body.bg-hallway {
   background-color: #fffaf2;
   background-image:
     url("/viar-demo/images/bg-hallway.jpg"),
     linear-gradient(#fffaf2, #ffe8d1);
 }
 
-body:has(tw-passage[tags~="ending"]) {
+body.bg-ending {
   background-color: #fff0f6;
   background-image:
     url("/viar-demo/images/bg-ending.jpg"),
@@ -186,11 +184,8 @@ tw-link:active, a.internalLink:active {
 
 tw-link::after { content: ""; }
 
-tw-link.visited, tw-link.visited:hover {
-  color: #4a2f20 !important;
-}
-
-tw-link.visited, 
+/* Prevent visited links turning purple */
+tw-link.visited,
 tw-link.visited:hover,
 a.internalLink.visited,
 a.internalLink.visited:hover {
@@ -204,19 +199,20 @@ a.internalLink.visited:hover {
     ending: "bg-ending",
   };
 
-  const ALL_BG_CLASSES = new Set(Object.values(TAG_TO_CLASS));
+  const ALL_BG_CLASSES = Object.values(TAG_TO_CLASS);
 
   function applyBackgroundFromPassage() {
     const passage = document.querySelector("tw-passage");
     if (!passage) return;
 
+    // In Harlowe, tags are stored on the passage element
     const tagsAttr = passage.getAttribute("tags") || "";
     const tags = tagsAttr.split(/\s+/).filter(Boolean);
 
     // Clear existing bg classes
-    ALL_BG_CLASSES.forEach(c => document.body.classList.remove(c));
+    for (const c of ALL_BG_CLASSES) document.body.classList.remove(c);
 
-    // Apply first matching tag class (priority order)
+    // Apply first matching tag class
     for (const t of tags) {
       const cls = TAG_TO_CLASS[t];
       if (cls) {
@@ -226,19 +222,24 @@ a.internalLink.visited:hover {
     }
   }
 
-  // Run once at start
-  applyBackgroundFromPassage();
+  // Run once after initial render
+  setTimeout(applyBackgroundFromPassage, 0);
 
   // Re-run whenever Twine swaps passages
+  const root = document.querySelector("tw-story") || document.body;
   const obs = new MutationObserver(() => applyBackgroundFromPassage());
-  obs.observe(document.body, { childList: true, subtree: true });
-})();</script><tw-tag name="patientroom" color="green"></tw-tag><tw-tag name="medroom" color="orange"></tw-tag><tw-tag name="hallway" color="orange"></tw-tag><tw-tag name="ending" color="blue"></tw-tag><tw-tag name="station" color="orange"></tw-tag><tw-passagedata pid="1" name="Start" tags="station" position="1225,600" size="100,100"> Start
-(set: $safety to 2)
-(set: $trust to 2)
-(set: $eff to 2)
+  obs.observe(root, { childList: true, subtree: true });
+})();</script><tw-tag name="patientroom" color="green"></tw-tag><tw-tag name="medroom" color="orange"></tw-tag><tw-tag name="hallway" color="orange"></tw-tag><tw-tag name="ending" color="blue"></tw-tag><tw-tag name="station" color="orange"></tw-tag><tw-passagedata pid="1" name="Start" tags="station" position="1225,600" size="100,100">Start
+(set: $safety to 0)
+(set: $trust to 0)
+(set: $eff to 0)
 (set: $path to &quot;&quot;)
 (set: $ended to false)
+
 (set: $harm to false)
+(set: $nearMiss to false)
+(set: $safetyGate to false)
+
 (set: $time to 0)
 (set: $timeLimit to 6)
 
@@ -253,16 +254,17 @@ a.internalLink.visited:hover {
 
     [[Start Shift-&gt;A1]]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="2" name="A1" tags="station" position="1225,725" size="100,100">(set: $path to $path + &quot;A1 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="2" name="A1" tags="station" position="1225,725" size="100,100">A1
+(set: $path to $path + &quot;A1 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A1&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    You’re starting your shift. Mr. Lee is due for pain meds.
+    You’re starting your shift. Mr. Lee is due for pain medication.
 
     Choose your first move:
 
@@ -271,58 +273,65 @@ a.internalLink.visited:hover {
     [[Check supplies/scanner-&gt;C1]]
     [[Continue-&gt;A2c]]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="3" name="A2" tags="medroom" position="1100,850" size="100,100">(set: $path to $path + &quot;A2 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="3" name="A2" tags="medroom" position="1100,850" size="100,100">A2
+(set: $path to $path + &quot;A2 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A2&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    Chart check: post-op. New pain-med order today. Allergy note exists.
+    Chart check: post-op. New pain-med order today. There’s an allergy note.
 
     (link: &quot;Read order details&quot;)[
-      (set: $safety to (min: 5, $safety + 1))
+      (set: $safety to $safety + 1)
       (goto: &quot;A3&quot;)
     ]
+
     (link: &quot;Proceed without details&quot;)[
-      (set: $eff to (min: 5, $eff + 1))
+      (set: $eff to $eff + 1)
       (goto: &quot;B1&quot;)
     ]
+
     (link: &quot;Ask charge nurse&quot;)[
-      (set: $safety to (min: 5, $safety + 1))
-      (set: $trust to (min: 5, $trust + 1))
+      (set: $safety to $safety + 1)
+      (set: $trust to $trust + 1)
       (goto: &quot;A2b&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="4" name="B1" tags="patientroom" position="1225,850" size="100,100">(set: $path to $path + &quot;B1 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="4" name="B1" tags="patientroom" position="1225,850" size="100,100">B1
+(set: $path to $path + &quot;B1 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: B1&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    In the room: Mr. Lee looks uncomfortable.  
+    In the room, Mr. Lee looks uncomfortable.
     Family: “He’s been in pain for hours.”
 
-    (link: &quot;ID check + pain scale first&quot;)[
+    (link: &quot;Do ID check and ask pain level&quot;)[
       (set: $safety to (min: 5, $safety + 1))
       (set: $trust to (min: 5, $trust + 1))
       (goto: &quot;A3&quot;)
     ]
-    (link: &quot;Promise meds now&quot;)[
+
+    (link: &quot;Reassure them you’ll bring medication soon&quot;)[
       (set: $trust to (min: 5, $trust + 1))
       (goto: &quot;B2&quot;)
     ]
-    (link: &quot;Ask symptoms quickly&quot;)[
+
+    (link: &quot;Ask quick symptom questions first&quot;)[
       (set: $eff to (min: 5, $eff + 1))
       (goto: &quot;B3&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="5" name="C1" tags="medroom" position="1350,850" size="100,100">(set: $path to $path + &quot;C1 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="5" name="C1" tags="medroom" position="1350,850" size="100,100">C1
+(set: $path to $path + &quot;C1 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: C1&lt;/div&gt;
@@ -331,27 +340,31 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    Med cart is low. Scanner battery is low.
+    The med cart is low, and the scanner battery is nearly dead.
 
-    (link: &quot;Swap scanner battery&quot;)[
-      (set: $eff to (min: 5, $eff + 1))
+    (link: &quot;Swap the scanner battery&quot;)[
+      (set: $eff to $eff + 1)
+      (set: $safety to $safety + 1)
       (goto: &quot;A3&quot;)
     ]
+
     (link: &quot;Ignore it and go anyway&quot;)[
-      (set: $eff to (min: 5, $eff + 1))
-      (set: $safety to (max: 0, $safety - 1))
+      (set: $eff to $eff + 1)
+      (set: $safety to $safety - 1)
       (goto: &quot;C1b&quot;)
     ]
-    (link: &quot;Ask for help&quot;)[
-      (set: $trust to (min: 5, $trust + 1))
+
+    (link: &quot;Ask a coworker for help&quot;)[
+      (set: $trust to $trust + 1)
       (goto: &quot;C1b&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="6" name="A2b" tags="medroom" position="1100,975" size="100,100">(set: $path to $path + &quot;A2b &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="6" name="A2b" tags="medroom" position="1100,975" size="100,100">A2b
+(set: $path to $path + &quot;A2b &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A2b&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
@@ -359,14 +372,18 @@ a.internalLink.visited:hover {
     Charge nurse: “Double-check new orders. We’ve had mix-ups.”
 
     (link: &quot;Go to the room now&quot;)[
+      (set: $trust to $trust + 1)
       (goto: &quot;A3&quot;)
     ]
+
     (link: &quot;Re-check allergies first&quot;)[
-      (set: $safety to (min: 5, $safety + 1))
+      (set: $trust to $trust + 1)
+      (set: $safety to $safety + 1)
       (goto: &quot;A3&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="7" name="C1b" tags="medroom" position="1350,975" size="100,100">(set: $path to $path + &quot;C1b &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="7" name="C1b" tags="medroom" position="1350,975" size="100,100">C1b
+(set: $path to $path + &quot;C1b &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: C1b&lt;/div&gt;
@@ -375,22 +392,26 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    Scanner fails once. You can still proceed, but scanning might not work.
+    The scanner fails once. You can still proceed, but barcode scanning might not work.
 
-    (link: &quot;Fix scanner now&quot;)[
-      (set: $safety to (min: 5, $safety + 1))
+    (link: &quot;Fix the scanner now&quot;)[
+      (set: $safety to $safety + 1)
+      (set: $eff to $eff + 1)
       (goto: &quot;A3&quot;)
     ]
-    (link: &quot;Proceed without scan&quot;)[
-      (set: $eff to (min: 5, $eff + 1))
+
+    (link: &quot;Proceed without scanning&quot;)[
+      (set: $eff to $eff + 1)
+      (set: $safety to $safety - 1)
       (goto: &quot;C2&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="8" name="A3" tags="patientroom" position="1100,1100" size="100,100">(set: $path to $path + &quot;A3 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="8" name="A3" tags="patientroom" position="1100,1100" size="100,100">A3
+(set: $path to $path + &quot;A3 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A3&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
@@ -399,77 +420,86 @@ a.internalLink.visited:hover {
     Mr. Lee: “Some meds make me itchy.”
 
     (link: &quot;Ask which meds caused itching&quot;)[
-      (set: $safety to (min: 5, $safety + 1))
-      (set: $trust to (min: 5, $trust + 1))
+      (set: $safety to $safety + 1)
+      (set: $trust to $trust + 1)
       (goto: &quot;A4&quot;)
     ]
+
     (link: &quot;Note it and continue&quot;)[
-      (set: $eff to (min: 5, $eff + 1))
+      (set: $eff to $eff + 1)
       (goto: &quot;A4&quot;)
     ]
+
     (link: &quot;Check vitals now&quot;)[
-      (set: $safety to (min: 5, $safety + 1))
+      (set: $safety to $safety + 1)
       (goto: &quot;A4b&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="9" name="B2" tags="patientroom" position="1225,975" size="100,100">(set: $path to $path + &quot;B2 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="9" name="B2" tags="patientroom" position="1225,975" size="100,100">B2
+(set: $path to $path + &quot;B2 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: B2&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    You promised meds quickly. Family is watching closely.
+    You promise the medication quickly. The family is watching closely.
 
-    (link-goto: &quot;Do ID check before leaving&quot;, &quot;A3&quot;)[
+    (link: &quot;Do an ID check before you go&quot;)[
       (set: $safety to (min: 5, $safety + 1))
       (set: $trust to (min: 5, $trust + 1))
+      (goto: &quot;A3&quot;)
     ]
 
-    (link-goto: &quot;Skip ID check to save time&quot;, &quot;B4&quot;)[
+    (link: &quot;Skip the ID check and move fast&quot;)[
       (set: $harm to true)
       (set: $eff to (min: 5, $eff + 1))
       (set: $safety to (max: 0, $safety - 2))
       (set: $trust to (max: 0, $trust - 1))
+      (goto: &quot;B4&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="10" name="B3" tags="patientroom" position="1225,1100" size="100,100">(set: $path to $path + &quot;B3 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="10" name="B3" tags="patientroom" position="1225,1100" size="100,100">B3
+(set: $path to $path + &quot;B3 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: B3&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    Mr. Lee mentions dizziness and itching history.
+    Mr. Lee mentions dizziness and says some past meds made him itchy.
 
     (link: &quot;Check vitals first&quot;)[
       (goto: &quot;A4b&quot;)
     ]
-    (link: &quot;Go get meds first&quot;)[
+
+    (link: &quot;Go get the meds first&quot;)[
       (set: $eff to (min: 5, $eff + 1))
       (goto: &quot;A4&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="11" name="A4" tags="medroom" position="1100,1225" size="100,100">(set: $path to $path + &quot;A4 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="11" name="A4" tags="medroom" position="1100,1225" size="100,100">A4
+(set: $path to $path + &quot;A4 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A4&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
     You prep the medication and attempt to scan.
 
-    (link: &quot;Scan succeeds → continue&quot;)[
+    (link: &quot;Scan succeeds&quot;)[
       (goto: &quot;A5&quot;)
     ]
-    (link: &quot;Pause to re-check order&quot;)[
-      (set: $safety to (min: 5, $safety + 1))
+
+    (link: &quot;Pause to re-check the order&quot;)[
+      (set: $safety to $safety + 1)
       (goto: &quot;A5&quot;)
     ]
   &lt;/div&gt;
@@ -491,24 +521,28 @@ a.internalLink.visited:hover {
       (goto: &quot;D1&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="13" name="D1" tags="hallway" position="1475,850" size="100,100">(set: $path to $path + &quot;D1 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="13" name="D1" tags="hallway" position="1475,850" size="100,100">D1
+(set: $path to $path + &quot;D1 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: D1&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
     Provider: “What’s going on?”
 
-    (link: &quot;Give clear SBAR summary&quot;)[
+    (link: &quot;Give an SBAR summary&quot;)[
       (set: $safety to (min: 5, $safety + 1))
       (set: $trust to (min: 5, $trust + 1))
+      (set: $time to (min: $timeLimit, $time + 1))
       (goto: &quot;A7&quot;)
     ]
-    (link: &quot;Vague summary&quot;)[
+
+    (link: &quot;Give a quick summary&quot;)[
       (set: $trust to (max: 0, $trust - 1))
+      (set: $time to (min: $timeLimit, $time + 1))
       (goto: &quot;B6&quot;)
     ]
   &lt;/div&gt;
@@ -523,31 +557,41 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    &lt;b&gt;SCAN WARNING:&lt;/b&gt; possible allergy conflict / order mismatch.
+    &lt;b&gt;SCAN WARNING:&lt;/b&gt; possible allergy conflict or order mismatch.
 
-    (link-goto: &quot;Stop &amp; double-check (slow but safe)&quot;, &quot;A5b&quot;)[
+    (link: &quot;Stop and double-check&quot;)[
+      (set: $nearMiss to true)
       (set: $safetyGate to true)
-      (set: $safety to (min: 5, $safety + 2))
-      (set: $eff to (max: 0, $eff - 1))
-      (set: $time to (min: $timeLimit,$time + 1))
+      (set: $safety to $safety + 2)
+      (set: $eff to $eff - 1)
+      (set: $time to $time + 1)
+      (goto: &quot;A5b&quot;)
     ]
-    (link-goto: &quot;Ask another nurse to confirm (team check)&quot;, &quot;A5b&quot;)[
+
+    (link: &quot;Ask another nurse to confirm&quot;)[
+      (set: $nearMiss to true)
       (set: $safetyGate to true)
-      (set: $safety to (min: 5, $safety + 1))
-      (set: $trust to (min: 5, $trust + 1))
-      (set: $time to (min: $timeLimit,$time + 1))
+      (set: $safety to $safety + 1)
+      (set: $trust to $trust + 1)
+      (set: $time to $time + 1)
+      (goto: &quot;A5b&quot;)
     ]
-    (link-goto: &quot;Call pharmacy/provider (fast escalation)&quot;, &quot;A7&quot;)[
+
+    (link: &quot;Call pharmacy or provider&quot;)[
+      (set: $nearMiss to true)
       (set: $safetyGate to true)
-      (set: $safety to (min: 5, $safety + 1))
-      (set: $eff to (min: 5, $eff + 1))
-      (set: $time to (min: $timeLimit,$time + 1))
+      (set: $safety to $safety + 1)
+      (set: $eff to $eff + 1)
+      (set: $time to $time + 1)
+      (goto: &quot;A7&quot;)
     ]
-    (link-goto: &quot;Override and give (fastest, risky)&quot;, &quot;B6&quot;)[
+
+    (link: &quot;Override and give&quot;)[
       (set: $harm to true)
-      (set: $eff to (min: 5, $eff + 2))
-      (set: $safety to (max: 0, $safety - 2))
-      (set: $trust to (max: 0, $trust - 1))
+      (set: $eff to $eff + 2)
+      (set: $safety to $safety - 2)
+      (set: $trust to $trust - 1)
+      (goto: &quot;B6&quot;)
     ]
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="15" name="A6" tags="hallway" position="1100,1600" size="100,100">A6
@@ -560,18 +604,23 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    You find a near-miss risk (similar-name med / unclear allergy note).
+    You find a near-miss risk: similar medication name and an unclear allergy note.
 
-    (link-goto: &quot;Hold med + page provider&quot;, &quot;A7&quot;)[
-      (set: $time to (min: $timeLimit,$time + 1))
+    (link: &quot;Hold medication and page the provider&quot;)[
+      (set: $time to $time + 1)
+      (goto: &quot;A7&quot;)
     ]
-    (link-goto: &quot;Escalate to charge nurse&quot;, &quot;A7&quot;)[
-      (set: $trust to (min: 5, $trust + 1))
-      (set: $time to (min: $timeLimit,$time + 1))
+
+    (link: &quot;Escalate to charge nurse&quot;)[
+      (set: $trust to $trust + 1)
+      (set: $time to $time + 1)
+      (goto: &quot;A7&quot;)
     ]
-    (link-goto: &quot;Call pharmacy for clarification (read-back)&quot;, &quot;A6b&quot;)[
-      (set: $safety to (min: 5, $safety + 1))
-      (set: $time to (min: $timeLimit,$time + 1))
+
+    (link: &quot;Call pharmacy for clarification&quot;)[
+      (set: $safety to $safety + 1)
+      (set: $time to $time + 1)
+      (goto: &quot;A6b&quot;)
     ]
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="16" name="A7" tags="hallway" position="1225,1600" size="100,100">A7
@@ -586,19 +635,24 @@ a.internalLink.visited:hover {
   &lt;div class=&quot;content&quot;&gt;
     Provider (rushed): “He needs pain control now.”
 
-    (link-goto: &quot;Advocate: safety concern, request corrected order&quot;, &quot;A8&quot;)[
-      (set: $safety to (min: 5, $safety + 1))
-      (set: $trust to (min: 5, $trust + 1))
-      (set: $time to (min: $timeLimit,$time + 1))
+    (link: &quot;Advocate for a corrected order&quot;)[
+      (set: $safety to $safety + 1)
+      (set: $trust to $trust + 1)
+      (set: $time to $time + 1)
+      (goto: &quot;A8&quot;)
     ]
-    (link-goto: &quot;Use SBAR vs cave under pressure (communication choice)&quot;, &quot;A7b&quot;)[
-      (set: $time to (min: $timeLimit,$time + 1))
+
+    (link: &quot;Use SBAR under pressure&quot;)[
+      (set: $time to $time + 1)
+      (goto: &quot;A7b&quot;)
     ]
-    (link-goto: &quot;Accept and proceed anyway&quot;, &quot;B6&quot;)[
-      (set: $eff to (min: 5, $eff + 1))
-      (set: $safety to (max: 0, $safety - 1))
+
+    (link: &quot;Accept and proceed anyway&quot;)[
+      (set: $eff to $eff + 1)
+      (set: $safety to $safety - 1)
       (set: $harm to true)
-      (set: $time to (min: $timeLimit,$time + 1))
+      (set: $time to $time + 1)
+      (goto: &quot;B6&quot;)
     ]
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="17" name="A8" tags="patientroom" position="1350,1600" size="100,100">A8
@@ -614,29 +668,27 @@ a.internalLink.visited:hover {
     Family: “Why are you delaying? He’s suffering.”
 
     (link: &quot;Explain the safety check simply&quot;)[
-      (set: $trust to (min: 5, $trust + 2))
-      (set: $time to (min: $timeLimit, $time + 1))
+      (set: $trust to $trust + 2)
+      (set: $time to $time + 1)
       (goto: &quot;A9&quot;)
     ]
 
-    (link: &quot;Do a quick bedside reassess + explain next steps (more thorough)&quot;)[
-      (set: $trust to (min: 5, $trust + 1))
-      (set: $safety to (min: 5, $safety + 1))
-      (set: $time to (min: $timeLimit, $time + 2))
+    (link: &quot;Reassess at bedside and explain next steps&quot;)[
+      (set: $trust to $trust + 1)
+      (set: $safety to $safety + 1)
+      (set: $time to $time + 2)
       (goto: &quot;A8b&quot;)
     ]
 
     (link: &quot;Avoid explanation and leave&quot;)[
-      (set: $trust to (max: 0, $trust - 2))
-      (set: $eff to (min: 5, $eff + 1))
-      (set: $time to (min: $timeLimit, $time + 0))
+      (set: $trust to $trust - 2)
+      (set: $eff to $eff + 1)
       (goto: &quot;B7&quot;)
     ]
 
     (link: &quot;Blame the system&quot;)[
-      (set: $trust to (max: 0, $trust - 1))
-      (set: $eff to (min: 5, $eff + 1))
-      (set: $time to (min: $timeLimit, $time + 0))
+      (set: $trust to $trust - 1)
+      (set: $eff to $eff + 1)
       (goto: &quot;B7&quot;)
     ]
   &lt;/div&gt;
@@ -654,84 +706,99 @@ a.internalLink.visited:hover {
 
     (goto: &quot;Result&quot;)
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="19" name="C2" tags="medroom" position="1350,1100" size="100,100">(set: $path to $path + &quot;C2 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="19" name="C2" tags="medroom" position="1350,1100" size="100,100">C2
+(set: $path to $path + &quot;C2 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: C2&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    You administer without scanning. It’s fast… but risky.
+    You administer without scanning. It’s fast, but risky.
 
-    (link-goto: &quot;Monitor closely and document&quot;, &quot;End2&quot;)[
-      (set: $harm to true)
+    (link: &quot;Monitor closely and document&quot;)[
+      (set: $nearMiss to true)
       (set: $eff to (min: 5, $eff + 1))
+      (set: $trust to $trust - 1) 
+      (goto: &quot;Result&quot;)
     ]
 
-    (link-goto: &quot;Realize the risk and stop to verify&quot;, &quot;A5&quot;)[
-      (set: $harm to false)  /* optional: “you corrected it” */
+    (link: &quot;Realize the risk and stop to verify&quot;)[
+      (set: $harm to false)
       (set: $safety to (min: 5, $safety + 1))
+      (goto: &quot;A5&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="20" name="B4" tags="hallway" position="1225,1225" size="100,100">(set: $path to $path + &quot;B4 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="20" name="B4" tags="hallway" position="1225,1225" size="100,100">B4
+(set: $path to $path + &quot;B4 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: B4&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    You notice an armband detail you didn’t verify earlier.
+    You notice a wristband detail you didn’t verify earlier.
 
-    (link: &quot;Stop immediately to verify&quot;)[
+    (link: &quot;Stop and verify now&quot;)[
       (set: $safety to (min: 5, $safety + 2))
+      (set: $time to (min: $timeLimit, $time + 1))
       (goto: &quot;A3&quot;)
     ]
+
     (link: &quot;Keep going&quot;)[
       (set: $safety to (max: 0, $safety - 2))
+      (set: $time to (min: $timeLimit, $time + 1))
       (goto: &quot;B6&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="21" name="B6" tags="hallway" position="1225,1350" size="100,100">(set: $path to $path + &quot;B6 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="21" name="B6" tags="hallway" position="1225,1350" size="100,100">B6
+(set: $path to $path + &quot;B6 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: B6&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    Your choice increases risk of a bad reaction / escalation.
+    Your choice increases the risk of a bad reaction or escalation.
 
     (link: &quot;Call rapid response&quot;)[
       (set: $trust to (max: 0, $trust - 1))
-      (goto: &quot;End3&quot;)
+      (goto: &quot;B8&quot;)
     ]
+
     (link: &quot;Notify provider and monitor&quot;)[
       (set: $eff to (min: 5, $eff + 1))
-      (goto: &quot;End3&quot;)
+      (goto: &quot;B8&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="22" name="B7" tags="patientroom" position="1350,1350" size="100,100">(set: $path to $path + &quot;B7 &quot;)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="22" name="B7" tags="patientroom" position="1350,1350" size="100,100">B7
+(set: $path to $path + &quot;B7 &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: B7&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    Family trust drops. Tension rises.
+    The family looks frustrated.  
+    “So… what’s happening? Are you even giving him something for pain?”
 
-    (link: &quot;Repair with a clear explanation&quot;)[
+    (link: &quot;Give a clear, calm explanation&quot;)[
       (set: $trust to (min: 5, $trust + 2))
+      (set: $safety to (min: 5, $safety + 1))
       (goto: &quot;A9&quot;)
     ]
-    (link: &quot;Ask charge nurse to speak&quot;)[
+
+    (link: &quot;Ask the charge nurse to help de-escalate&quot;)[
       (set: $trust to (min: 5, $trust + 1))
+      (set: $eff to (min: 5, $eff + 1))
       (goto: &quot;A9&quot;)
     ]
   &lt;/div&gt;
@@ -739,7 +806,7 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: End1&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
@@ -747,49 +814,105 @@ a.internalLink.visited:hover {
     &lt;b&gt;End 1 — Safe + Trusted ✅&lt;/b&gt;
 
     You prevented a near-miss and kept everyone in the loop.
-    Clear communication built trust across the team.
 
+    (if: $nearMiss is true)[
+      You caught the scan warning and chose to verify instead of rushing.
+    ]
+
+    (if: $trust &gt;= 4)[
+      The family thanks you for explaining clearly and staying calm.
+    ]
+
+    (if: $time &gt;= $timeLimit)[
+      Even under time pressure, you stayed safe and made the right calls.
+    ]
+
+    &lt;br&gt;&lt;br&gt;
+    &lt;b&gt;Summary&lt;/b&gt;&lt;br&gt;
+    Safety: $safety&lt;br&gt;
+    Trust: $trust&lt;br&gt;
+    Efficiency: $eff&lt;br&gt;
+    Time: $time/$timeLimit&lt;br&gt;
+
+    &lt;br&gt;
     Path: $path
 
+    &lt;br&gt;&lt;br&gt;
     [[Restart-&gt;Start]]
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="24" name="End3" tags="ending station" position="900,1500" size="100,100">(set: $ended to true)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: End3&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
     &lt;b&gt;End 3 — Learning Moment 🧠&lt;/b&gt;
 
-    The situation escalated or trust broke down.
-    This is why nurses pause, verify, and advocate.
+    (if: $harm is true)[
+      A reaction risk appeared after skipping a safety step.
+    ]
+    (else:)[
+      The situation became harder to manage, or trust dropped with the patient, family, or team.
+    ]
 
+    You can still recover in real life by slowing down, verifying, and communicating clearly.
+
+    &lt;br&gt;&lt;br&gt;
+    &lt;b&gt;Summary&lt;/b&gt;&lt;br&gt;
+    Safety: $safety&lt;br&gt;
+    Trust: $trust&lt;br&gt;
+    Efficiency: $eff&lt;br&gt;
+    Time: $time/$timeLimit&lt;br&gt;
+
+    &lt;br&gt;
     Path: $path
 
+    &lt;br&gt;&lt;br&gt;
     [[Restart-&gt;Start]]
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="25" name="End2" tags="ending station" position="725,1500" size="100,100">(set: $ended to true)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: End2&lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
     &lt;b&gt;End 2 — Safe + Efficient ✅&lt;/b&gt;
 
-    You caught the risk and kept care moving without delay.
-    Not a lot of teamwork or extra communication — but solid, safe execution.
+    You kept care moving while still staying safe enough to avoid harm.
 
+    (if: $nearMiss is true)[
+      You caught the scan warning and fixed the risk without stalling the whole shift.
+    ]
+
+    (if: $trust &gt;= 4)[
+      The family seems relieved because you explained what you were doing.
+    ]
+
+    (if: $time &gt;= $timeLimit)[
+      You stayed safe even under time pressure and still got the job done.
+    ]
+
+    &lt;br&gt;&lt;br&gt;
+    &lt;b&gt;Summary&lt;/b&gt;&lt;br&gt;
+    Safety: $safety&lt;br&gt;
+    Trust: $trust&lt;br&gt;
+    Efficiency: $eff&lt;br&gt;
+    Time: $time/$timeLimit&lt;br&gt;
+
+    &lt;br&gt;
     Path: $path
 
+    &lt;br&gt;&lt;br&gt;
     [[Restart-&gt;Start]]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="26" name="Result" tags="" position="1650,1600" size="100,100">(set: $ended to true)
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="26" name="Result" tags="" position="1650,1600" size="100,100">Result
+(set: $ended to true)
 
 (set: $wSafety to 0.45)
 (set: $wTrust to 0.35)
@@ -797,38 +920,25 @@ a.internalLink.visited:hover {
 
 (set: $score to ($safety * $wSafety) + ($trust * $wTrust) + ($eff * $wEff))
 
-;; helper flags
 (set: $overTime to ($time &gt;= $timeLimit))
-(if: (not: (isset: $nearMiss)))[(set: $nearMiss to false)]
 
-;; HARD FAIL
 (if: $harm is true)[
   (goto: &quot;End3&quot;)
 ]
+(else-if: $safety &gt;= 4 and $trust &gt;= 4 and $score &gt;= 4.2)[
+  (goto: &quot;End1&quot;)
+]
+(else-if: $safety &gt;= 2 and (
+  $eff &gt;= 4
+  or $overTime is true
+  or $nearMiss is true
+))[
+  (goto: &quot;End2&quot;)
+]
 (else:)[
-
-  ;; End1 = safe + trusted (best)
-  (if: $score &gt;= 4.2 and $trust &gt;= 4 and $safety &gt;= 4)[
-    (goto: &quot;End1&quot;)
-  ]
-
-  ;; End2 = safe-enough AND efficient under pressure
-  ;; - You can get it via: efficiency, overtime, OR any “near-miss handled” moment
-  (else-if: $safety &gt;= 3 and (
-      $eff &gt;= 4
-      or $overTime is true
-      or $nearMiss is true
-    ))[
-    (goto: &quot;End2&quot;)
-  ]
-
-  ;; End3 = learning moment
-  (else:)[
-    (goto: &quot;End3&quot;)
-  ]
+  (goto: &quot;End3&quot;)
 ]</tw-passagedata><tw-passagedata pid="27" name="A2c" tags="station" position="975,850" size="100,100">A2c
 (set: $path to $path + &quot;A2c &quot;)
-(set: $time to $time + 1)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A2c&lt;/div&gt;
@@ -839,19 +949,26 @@ a.internalLink.visited:hover {
   &lt;div class=&quot;content&quot;&gt;
     Mr. Lee grimaces. A family member asks, “Is he getting something for pain or not?”
 
-    (link-goto: &quot;Explain calmly + set expectations (build trust)&quot;, &quot;A5&quot;)[
+    (link: &quot;Explain calmly and set expectations&quot;)[
       (set: $trust to (min: 5, $trust + 1))
-      (set: $time to (min: $timeLimit,$time + 1))
+      (set: $time to (min: $timeLimit, $time + 1))
+      (goto: &quot;A5&quot;)
     ]
-    (link-goto: &quot;Short answer, keep moving (save time)&quot;, &quot;A5&quot;)[
+
+    (link: &quot;Give a short answer and keep moving&quot;)[
       (set: $eff to (min: 5, $eff + 1))
+      (set: $time to (min: $timeLimit, $time + 1))
+      (goto: &quot;A5&quot;)
     ]
-    (link-goto: &quot;Promise fast relief (risk later pressure)&quot;, &quot;A5&quot;)[
+
+    (link: &quot;Promise fast relief&quot;)[
       (set: $eff to (min: 5, $eff + 1))
       (set: $trust to (max: 0, $trust - 1))
+      (set: $time to (min: $timeLimit, $time + 1))
+      (goto: &quot;A5&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="28" name="A5b" tags="station" position="1225,1475" size="100,100">:: A5b
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="28" name="A5b" tags="station" position="1350,1475" size="100,100">A5b
 (set: $path to $path + &quot;A5b &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
@@ -863,21 +980,25 @@ a.internalLink.visited:hover {
   &lt;div class=&quot;content&quot;&gt;
     You pause at the workstation. The chart shows a messy allergy note and two similar medication names.
 
-    (link-goto: &quot;Do full MAR + allergy history review (slow, strong safety)&quot;, &quot;A6&quot;)[
-      (set: $safety to (min: 5, $safety + 1))
-      (set: $eff to (max: 0, $eff - 1))
-      (set: $time to (min: $timeLimit, $time + 2))
+    (link: &quot;Do full MAR and allergy history review&quot;)[
+      (set: $safety to $safety + 1)
+      (set: $eff to $eff - 1)
+      (set: $time to $time + 2)
+      (goto: &quot;A6&quot;)
     ]
-    (link-goto: &quot;Quick verify: wristband + last admin record (balanced)&quot;, &quot;A6&quot;)[
-      (set: $safety to (min: 5, $safety + 1))
-      (set: $eff to (min: 5, $eff + 1))
-      (set: $time to (min: $timeLimit, $time + 1))
+
+    (link: &quot;Quick verify wristband and last administration record&quot;)[
+      (set: $safety to $safety + 1)
+      (set: $eff to $eff + 1)
+      (set: $time to $time + 1)
+      (goto: &quot;A6&quot;)
     ]
-    (link-goto: &quot;Skip chart digging (move fast)&quot;, &quot;B6&quot;)[
-      (set: $eff to (min: 5, $eff + 2))
-      (set: $safety to (max: 0, $safety - 2))
+
+    (link: &quot;Skip chart review and move fast&quot;)[
+      (set: $eff to $eff + 2)
+      (set: $safety to $safety - 2)
       (set: $harm to true)
-      (set: $time to (min: $timeLimit, $time + 0))
+      (goto: &quot;B6&quot;)
     ]
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="29" name="A6b" tags="station" position="1100,1725" size="100,100">A6b
@@ -892,14 +1013,17 @@ a.internalLink.visited:hover {
   &lt;div class=&quot;content&quot;&gt;
     Pharmacy calls back: “We can correct the order, but we need confirmation. What’s the allergy reaction type?”
 
-    (link-goto: &quot;Do read-back + clarify reaction (best practice)&quot;, &quot;A7&quot;)[
-      (set: $safety to (min: 5, $safety + 1))
-      (set: $trust to (min: 5, $trust + 1))
-      (set: $time to (min: $timeLimit,$time + 1))
+    (link: &quot;Do read-back and clarify reaction&quot;)[
+      (set: $safety to $safety + 1)
+      (set: $trust to $trust + 1)
+      (set: $time to $time + 1)
+      (goto: &quot;A7&quot;)
     ]
-    (link-goto: &quot;Give quick answer, no read-back (faster)&quot;, &quot;A7&quot;)[
-      (set: $eff to (min: 5, $eff + 1))
-      (set: $safety to (max: 0, $safety - 1))
+
+    (link: &quot;Give a quick answer without read-back&quot;)[
+      (set: $eff to $eff + 1)
+      (set: $safety to $safety - 1)
+      (goto: &quot;A7&quot;)
     ]
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="30" name="A7b" tags="station" position="1225,1725" size="100,100">A7b
@@ -914,20 +1038,25 @@ a.internalLink.visited:hover {
   &lt;div class=&quot;content&quot;&gt;
     The provider sounds impatient. You can feel the time pressure.
 
-    (link-goto: &quot;Use SBAR (clear + fast communication)&quot;, &quot;A8b&quot;)[
-      (set: $trust to (min: 5, $trust + 1))
-      (set: $eff to (min: 5, $eff + 1))
-      (set: $time to (min: $timeLimit,$time + 1))
+    (link: &quot;Use SBAR&quot;)[
+      (set: $trust to $trust + 1)
+      (set: $eff to $eff + 1)
+      (set: $time to $time + 1)
+      (goto: &quot;A8b&quot;)
     ]
-    (link-goto: &quot;Hold firm: no admin until corrected order&quot;, &quot;A8b&quot;)[
-      (set: $safety to (min: 5, $safety + 1))
-      (set: $eff to (max: 0, $eff - 1))
-      (set: $time to (min: $timeLimit,$time + 1))
+
+    (link: &quot;Hold firm until the order is corrected&quot;)[
+      (set: $safety to $safety + 1)
+      (set: $eff to $eff - 1)
+      (set: $time to $time + 1)
+      (goto: &quot;A8b&quot;)
     ]
-    (link-goto: &quot;Fine—admin now (avoid conflict)&quot;, &quot;B6&quot;)[
-      (set: $eff to (min: 5, $eff + 1))
-      (set: $safety to (max: 0, $safety - 2))
+
+    (link: &quot;Administer now to avoid conflict&quot;)[
+      (set: $eff to $eff + 1)
+      (set: $safety to $safety - 2)
       (set: $harm to true)
+      (goto: &quot;B6&quot;)
     ]
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="31" name="A8b" tags="patientroom" position="1350,1725" size="100,100">A8b
@@ -940,23 +1069,28 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    Order is clarified. Before administering, you decide how thorough to be.
+    The order is clarified. Before administering, you decide how thorough to be.
 
-    (link-goto: &quot;Reassess pain + educate + document (trust-heavy)&quot;, &quot;A9&quot;)[
-      (set: $trust to (min: 5, $trust + 1))
-      (set: $safety to (min: 5, $safety + 1))
-      (set: $time to (min: $timeLimit,$time + 2))
+    (link: &quot;Reassess pain, educate, and document&quot;)[
+      (set: $trust to $trust + 1)
+      (set: $safety to $safety + 1)
+      (set: $time to $time + 2)
+      (goto: &quot;A9&quot;)
     ]
-    (link-goto: &quot;Quick reassess + document essentials (balanced)&quot;, &quot;A9&quot;)[
-      (set: $eff to (min: 5, $eff + 1))
-      (set: $time to (min: $timeLimit,$time + 1))
+
+    (link: &quot;Quick reassess and document essentials&quot;)[
+      (set: $eff to $eff + 1)
+      (set: $time to $time + 1)
+      (goto: &quot;A9&quot;)
     ]
-    (link-goto: &quot;Skip reassessment (save time)&quot;, &quot;A9&quot;)[
-      (set: $eff to (min: 5, $eff + 2))
-      (set: $safety to (max: 0, $safety - 1))
+
+    (link: &quot;Skip reassessment&quot;)[
+      (set: $eff to $eff + 2)
+      (set: $safety to $safety - 1)
+      (goto: &quot;A9&quot;)
     ]
   &lt;/div&gt;
-&lt;/div&gt;</tw-passagedata><tw-passagedata pid="32" name="B8" tags="patientroom" position="1475,1350" size="100,100">:: B8
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="32" name="B8" tags="patientroom" position="1475,1350" size="100,100">B8
 (set: $path to $path + &quot;B8 &quot;)
 (set: $time to (min: $timeLimit, $time + 1))
 (set: $nearMiss to true)
@@ -970,15 +1104,34 @@ a.internalLink.visited:hover {
   &lt;div class=&quot;content&quot;&gt;
     You notice early signs of a reaction. This is your chance to respond.
 
-    (link-goto: &quot;Stop med + call rapid response immediately&quot;, &quot;Result&quot;)[
+    (link: &quot;Stop medication and call rapid response&quot;)[
       (set: $safety to (min: 5, $safety + 1))
       (set: $trust to (max: 0, $trust - 1))
+      (goto: &quot;Result&quot;)
     ]
 
-    (link-goto: &quot;Notify provider + implement protocol quickly (fast recovery)&quot;, &quot;Result&quot;)[
+    (link: &quot;Notify provider and start the protocol&quot;)[
       (set: $eff to (min: 5, $eff + 1))
       (set: $safety to (max: 0, $safety - 1))
       (set: $trust to (max: 0, $trust - 1))
+      (goto: &quot;Result&quot;)
+    ]
+  &lt;/div&gt;
+&lt;/div&gt;</tw-passagedata><tw-passagedata pid="33" name="A5a" tags="medroom" position="1225,1475" size="100,100">A5a
+(set: $path to $path + &quot;A5a &quot;)
+(set: $time to $time + 1)
+
+&lt;div class=&quot;hud&quot;&gt;
+  &lt;div class=&quot;node&quot;&gt;Node: A5a&lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;Safety: $safety | Trust: $trust | Efficiency: $eff | Time: $time/$timeLimit&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;scene&quot;&gt;
+  &lt;div class=&quot;content&quot;&gt;
+    Everything looks normal at first. The barcode matches the patient wristband.
+
+    (link: &quot;Continue&quot;)[
+      (goto: &quot;A5&quot;)
     ]
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata></tw-storydata>
