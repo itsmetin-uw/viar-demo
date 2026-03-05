@@ -13,8 +13,7 @@
    ViaR Twine Stylesheet (CLEAN / JS-BG VERSION)
    - Background controlled by Story JavaScript (body.bg-*)
    - Centered glass UI
-   - High readability
-   - Tight paragraph spacing + no mystery gaps
+   - High readability (tight spacing)
    ========================= */
 
 html, body {
@@ -39,7 +38,7 @@ body {
   to   { background-size: 106% auto; }
 }
 
-/* Soft tint so UI reads */
+/* Soft dark tint so UI reads */
 body::before {
   content: "";
   position: fixed;
@@ -117,27 +116,24 @@ tw-passage {
   animation: fadeIn 220ms ease-out;
 }
 
-/* IMPORTANT: kill Harlowe auto <p> gaps that show up ABOVE your HUD */
-tw-passage > p {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* Hide truly empty auto-paragraphs */
-tw-passage > p:empty {
-  display: none !important;
-}
-
-/* Hide Harlowe passage title like "Start" if it appears */
-tw-passage > h1 {
-  display: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Hide Harlowe passage title (e.g., "Start") */
+tw-title,
+tw-passage > tw-title,
+tw-passage > h1,
+tw-passage > header {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Remove any “first element” top-gap inside the card */
+tw-passage > *:first-child {
+  margin-top: 0 !important;
 }
 
 /* HUD */
@@ -150,16 +146,12 @@ tw-passage > h1 {
 
   color: rgba(25, 20, 18, 0.88);
 }
-
 .node {
   font-weight: 800;
-  opacity: 1;
 }
-
 .stats {
   font-weight: 700;
   font-size: 0.95em;
-  opacity: 1;
 }
 
 /* Layout */
@@ -167,44 +159,28 @@ tw-passage > h1 {
 
 .content {
   max-width: 680px;
-  font-size: 1.05em;
-
-  /* tighter line spacing (sentence spacing) */
-  line-height: 1.30;
+  font-size: 1.03em;
+  line-height: 1.35;
 }
 
-/* =========================
-   Tighter paragraph spacing
-   ========================= */
-
-/* In case Harlowe wraps plain text into <p> inside .content */
-.content p {
-  margin: 0 0 4px 0;   /* smaller than your old 6px */
+/* Tight paragraph spacing (Twine wraps a lot of text in <p>) */
+tw-passage p {
+  margin: 0 0 4px 0;
 }
-.content p:last-child {
+tw-passage p:last-child {
   margin-bottom: 0;
 }
-.content p:first-child {
-  margin-top: 0;
-}
-.content p:empty {
+tw-passage p:empty {
   display: none;
 }
 
-/* Also tighten margins for common block elements if you use them */
-.content br { line-height: 1.0; }
-.content b { font-weight: 750; }
-
-/* =========================
-   Buttons / links
-   ========================= */
-
+/* Buttons */
 tw-link, a.internalLink {
   display: block;
   width: fit-content;
-  min-width: 280px;
+  min-width: 260px;
 
-  margin: 8px 0 0 0;   /* slightly tighter vertical spacing */
+  margin: 8px 0 0 0;
   padding: 10px 14px;
 
   border-radius: 14px;
@@ -228,7 +204,6 @@ tw-link:active, a.internalLink:active {
   transform: translateY(1px) scale(0.99);
 }
 
-/* Prevent the little arrow/marker some formats add */
 tw-link::after { content: ""; }
 
 /* Prevent visited links turning purple */
