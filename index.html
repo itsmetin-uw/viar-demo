@@ -152,6 +152,14 @@ tw-passage {
   line-height: 1.45;
 }
 
+/* Paragraph spacing inside your story content only */
+.content p {
+  margin: 0 0 12px 0;
+}
+.content p:last-child {
+  margin-bottom: 0;
+}
+
 /* Buttons */
 tw-link, a.internalLink {
   display: block;
@@ -811,34 +819,32 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    &lt;b&gt;End 1 — Safe + Trusted ✅&lt;/b&gt;
+    &lt;p&gt;&lt;b&gt;End 1 — Safe + Trusted ✅&lt;/b&gt;&lt;/p&gt;
 
-    You prevented a near-miss and kept everyone in the loop.
+    &lt;p&gt;You prevented a near-miss and kept everyone in the loop.&lt;/p&gt;
 
     (if: $nearMiss is true)[
-      You caught the scan warning and chose to verify instead of rushing.
+      &lt;p&gt;You caught the scan warning and chose to verify instead of rushing.&lt;/p&gt;
     ]
 
     (if: $trust &gt;= 4)[
-      The family thanks you for explaining clearly and staying calm.
+      &lt;p&gt;The family thanks you for explaining clearly and staying calm.&lt;/p&gt;
     ]
 
     (if: $time &gt;= $timeLimit)[
-      Even under time pressure, you stayed safe and made the right calls.
+      &lt;p&gt;Even under time pressure, you stayed safe and made the right calls.&lt;/p&gt;
     ]
 
-    &lt;br&gt;&lt;br&gt;
-    &lt;b&gt;Summary&lt;/b&gt;&lt;br&gt;
-    Safety: $safety&lt;br&gt;
-    Trust: $trust&lt;br&gt;
-    Efficiency: $eff&lt;br&gt;
-    Time: $time/$timeLimit&lt;br&gt;
+    &lt;p&gt;&lt;b&gt;Summary&lt;/b&gt;&lt;br&gt;
+      Safety: $safety&lt;br&gt;
+      Trust: $trust&lt;br&gt;
+      Efficiency: $eff&lt;br&gt;
+      Time: $time/$timeLimit
+    &lt;/p&gt;
 
-    &lt;br&gt;
-    Path: $path
+    &lt;p&gt;Path: $path&lt;/p&gt;
 
-    &lt;br&gt;&lt;br&gt;
-    [[Restart-&gt;Start]]
+    &lt;p&gt;[[Restart-&gt;Start]]&lt;/p&gt;
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="24" name="End3" tags="ending station" position="900,1500" size="100,100">(set: $ended to true)
 
@@ -849,29 +855,27 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    &lt;b&gt;End 3 — Learning Moment 🧠&lt;/b&gt;
+    &lt;p&gt;&lt;b&gt;End 3 — Learning Moment 🧠&lt;/b&gt;&lt;/p&gt;
 
     (if: $harm is true)[
-      A reaction risk appeared after skipping a safety step.
+      &lt;p&gt;A reaction risk appeared after skipping a safety step.&lt;/p&gt;
     ]
     (else:)[
-      The situation became harder to manage, or trust dropped with the patient, family, or team.
+      &lt;p&gt;The situation became harder to manage, or trust dropped with the patient, family, or team.&lt;/p&gt;
     ]
 
-    You can still recover in real life by slowing down, verifying, and communicating clearly.
+    &lt;p&gt;You can still recover in real life by slowing down, verifying, and communicating clearly.&lt;/p&gt;
 
-    &lt;br&gt;&lt;br&gt;
-    &lt;b&gt;Summary&lt;/b&gt;&lt;br&gt;
-    Safety: $safety&lt;br&gt;
-    Trust: $trust&lt;br&gt;
-    Efficiency: $eff&lt;br&gt;
-    Time: $time/$timeLimit&lt;br&gt;
+    &lt;p&gt;&lt;b&gt;Summary&lt;/b&gt;&lt;br&gt;
+      Safety: $safety&lt;br&gt;
+      Trust: $trust&lt;br&gt;
+      Efficiency: $eff&lt;br&gt;
+      Time: $time/$timeLimit
+    &lt;/p&gt;
 
-    &lt;br&gt;
-    Path: $path
+    &lt;p&gt;Path: $path&lt;/p&gt;
 
-    &lt;br&gt;&lt;br&gt;
-    [[Restart-&gt;Start]]
+    &lt;p&gt;[[Restart-&gt;Start]]&lt;/p&gt;
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="25" name="End2" tags="ending station" position="725,1500" size="100,100">(set: $ended to true)
 
@@ -882,34 +886,33 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    &lt;b&gt;End 2 — Safe + Efficient ✅&lt;/b&gt;
+    &lt;p&gt;&lt;b&gt;End 2 — Safe + Efficient ✅&lt;/b&gt;&lt;/p&gt;
 
-    You kept care moving while still staying safe enough to avoid harm.
+    &lt;p&gt;You kept care moving while still staying safe enough to avoid harm.&lt;/p&gt;
 
     (if: $nearMiss is true)[
-      You caught the scan warning and fixed the risk without stalling the whole shift.
+      &lt;p&gt;You caught the scan warning and fixed the risk without stalling the whole shift.&lt;/p&gt;
     ]
 
     (if: $trust &gt;= 4)[
-      The family seems relieved because you explained what you were doing.
+      &lt;p&gt;The family seemed relieved because you explained what you were doing.&lt;/p&gt;
     ]
 
     (if: $time &gt;= $timeLimit)[
-      You stayed safe even under time pressure and still got the job done.
+      &lt;p&gt;You stayed safe even under time pressure and still got the job done.&lt;/p&gt;
     ]
 
-    &lt;br&gt;&lt;br&gt;
-    &lt;b&gt;Summary&lt;/b&gt;&lt;br&gt;
-    Safety: $safety&lt;br&gt;
-    Trust: $trust&lt;br&gt;
-    Efficiency: $eff&lt;br&gt;
-    Time: $time/$timeLimit&lt;br&gt;
+    &lt;p&gt;&lt;b&gt;Summary&lt;/b&gt;&lt;/p&gt;
+    &lt;p&gt;
+      Safety: $safety&lt;br&gt;
+      Trust: $trust&lt;br&gt;
+      Efficiency: $eff&lt;br&gt;
+      Time: $time/$timeLimit
+    &lt;/p&gt;
 
-    &lt;br&gt;
-    Path: $path
+    &lt;p&gt;Path: $path&lt;/p&gt;
 
-    &lt;br&gt;&lt;br&gt;
-    [[Restart-&gt;Start]]
+    &lt;p&gt;[[Restart-&gt;Start]]&lt;/p&gt;
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="26" name="Result" tags="" position="1650,1600" size="100,100">Result
 (set: $ended to true)
