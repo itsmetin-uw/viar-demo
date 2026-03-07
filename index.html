@@ -91,12 +91,12 @@ body.bg-ending {
 tw-story {
   min-height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
 
   max-width: 600px;
   margin: 0 0 0 5vw;
-  padding: 18px;
+  padding: 5vh 18px;
 
   background: transparent !important;
   position: relative;
@@ -144,6 +144,8 @@ tw-story {
 /* Glass card (readable + light) */
 tw-passage {
   width: min(560px, 88vw);
+  max-height: 80vh;
+  overflow-y: auto;
   border-radius: 18px;
   padding: 22px;
 
@@ -274,7 +276,7 @@ a.internalLink.visited:hover {
     "B2":  ["mr-lee", "family"],
     "B3":  ["mr-lee"],
     "B4":  [],
-    "A2b": ["charge-nurse"],
+    "A2b": ["nurse"],
     "A4b": ["family"],
     "D1":  ["provider"],
     "A5":  [],
