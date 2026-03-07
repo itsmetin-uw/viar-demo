@@ -105,19 +105,25 @@ tw-story {
 
 /* =========================================================
    CHARACTER OVERLAY LAYER
-   JS adds #char-layer to <body>; sprites position bottom-right
-   behind the glass card (z-index 5 < tw-story z-index 10)
+   Anchored to the RIGHT of the glass card so characters
+   sit in the scene gutter and don't cover choice buttons.
+   z-index 5 keeps them behind the card (z-index 10).
    ========================================================= */
 
 #char-layer {
   position: fixed;
   bottom: 0;
+  /* Push chars into the right gutter — starts past the card's right edge.
+     Card is max 920px wide centered, so right edge ≈ 50% + 460px.
+     We start the char area 8px outside that edge.                       */
+  left: calc(50% + min(460px, 46vw) + 8px);
   right: 0;
-  height: 72vh;
+  height: 78vh;
   display: flex;
   align-items: flex-end;
-  padding-right: 3vw;
-  gap: 14px;
+  justify-content: center;
+  gap: 10px;
+  padding-bottom: 0;
   pointer-events: none;
   z-index: 5;
 }
@@ -125,20 +131,43 @@ tw-story {
 .char-sprite {
   height: 100%;
   width: auto;
-  max-width: 18vw;
+  /* Fit into whatever gutter space is available */
+  max-width: 48%;
   object-fit: contain;
-  filter: drop-shadow(0 12px 32px rgba(0,0,0,0.28));
-  animation: charIn 280ms ease-out both;
+  object-position: bottom;
+
+  /* ── Blend into the scene ──────────────────────────────────
+     multiply: white pixels in the photo become transparent
+     (white × background colour = background colour).
+     Works even if rembg wasn't applied — eliminates the
+     visible white/grey box around the character photo.        */
+  mix-blend-mode: multiply;
+
+  /* Warm + slightly desaturate to match the painted background */
+  filter: sepia(0.22) saturate(0.82) brightness(1.06)
+          drop-shadow(-6px 0 18px rgba(160,100,30,0.18));
+
+  /* Fade out feet → grounds the character in the scene floor  */
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, black 16%);
+          mask-image: linear-gradient(to top, transparent 0%, black 16%);
+
+  animation: charIn 320ms ease-out both;
 }
 
 @keyframes charIn {
-  from { opacity: 0; transform: translateY(14px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0)   scale(1);     }
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
 }
 
-/* Hide on small screens where sprites would overlap the card */
+/* Hide on screens where gutter is too narrow */
 @media (max-width: 700px) {
   #char-layer { display: none; }
+}
+
+/* On medium screens (card fills most of the width) keep chars
+   smaller so they don't crowd the layout */
+@media (max-width: 1100px) {
+  #char-layer { height: 62vh; }
 }
 
 /* Glass card (readable + light) */
@@ -324,7 +353,7 @@ a.internalLink.visited:hover {
       charLayer.innerHTML = "";
       for (const charId of chars) {
         const img = document.createElement("img");
-        img.src = IMG_BASE + "char-" + charId + ".png";
+        img.src = IMG_BASE + "char-" + charId + ".svg";
         img.alt = charId;
         img.className = "char-sprite";
         charLayer.appendChild(img);
