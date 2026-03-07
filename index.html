@@ -29,7 +29,7 @@ body {
   background-position: center;
   background-repeat: no-repeat;
 
-  transition: background-color 220ms ease-out, background-image 220ms ease-out;
+  transition: background-color 220ms ease-out;
   animation: bgDrift 18s ease-in-out infinite alternate;
 }
 
@@ -99,6 +99,46 @@ tw-story {
   padding: 18px;
 
   background: transparent !important;
+  position: relative;
+  z-index: 10;
+}
+
+/* =========================================================
+   CHARACTER OVERLAY LAYER
+   JS adds #char-layer to <body>; sprites position bottom-right
+   behind the glass card (z-index 5 < tw-story z-index 10)
+   ========================================================= */
+
+#char-layer {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  height: 72vh;
+  display: flex;
+  align-items: flex-end;
+  padding-right: 3vw;
+  gap: 14px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.char-sprite {
+  height: 100%;
+  width: auto;
+  max-width: 18vw;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 32px rgba(0,0,0,0.28));
+  animation: charIn 280ms ease-out both;
+}
+
+@keyframes charIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);     }
+}
+
+/* Hide on small screens where sprites would overlap the card */
+@media (max-width: 700px) {
+  #char-layer { display: none; }
 }
 
 /* Glass card (readable + light) */
@@ -213,6 +253,8 @@ a.internalLink.visited,
 a.internalLink.visited:hover {
   color: #4a2f20 !important;
 }</style><script role="script" id="twine-user-script" type="text/twine-javascript">(function () {
+  const IMG_BASE = "https://raw.githubusercontent.com/itsmetin-uw/viar-demo/main/images/";
+
   const TAG_TO_CLASS = {
     station: "bg-station",
     patientroom: "bg-patientroom",
@@ -223,34 +265,69 @@ a.internalLink.visited:hover {
 
   const ALL_BG_CLASSES = Object.values(TAG_TO_CLASS);
 
+  // Which characters appear in each passage.
+  // Characters render left-to-right; right-most is visually "front".
+  const PASSAGE_CHARS = {
+    "B1":  ["mr-lee", "family"],
+    "A2c": ["mr-lee", "family"],
+    "A3":  ["mr-lee"],
+    "B2":  ["mr-lee", "family"],
+    "B3":  ["mr-lee"],
+    "B4":  [],
+    "A2b": ["charge-nurse"],
+    "A4b": ["family"],
+    "D1":  ["provider"],
+    "A5":  [],
+    "A5b": [],
+    "A6":  [],
+    "A6b": ["provider"],
+    "A7":  ["provider"],
+    "A7b": ["provider"],
+    "A8":  ["mr-lee", "family"],
+    "A8b": ["mr-lee"],
+    "A9":  ["mr-lee"],
+    "B7":  ["mr-lee", "family"],
+    "B8":  ["mr-lee"],
+  };
+
+  // Create and attach the character layer once
+  const charLayer = document.createElement("div");
+  charLayer.id = "char-layer";
+  document.body.appendChild(charLayer);
+
   function applyBackgroundFromPassage() {
     const passage = document.querySelector("tw-passage");
     if (!passage) return;
 
-    // In Harlowe, tags are stored on the passage element
     const tagsAttr = passage.getAttribute("tags") || "";
     const tags = tagsAttr.split(/\s+/).filter(Boolean);
 
-    // Clear existing bg classes
+    // Background class
     for (const c of ALL_BG_CLASSES) document.body.classList.remove(c);
-
-    // Apply first matching tag class
     for (const t of tags) {
       const cls = TAG_TO_CLASS[t];
-      if (cls) {
-        document.body.classList.add(cls);
-        break;
-      }
+      if (cls) { document.body.classList.add(cls); break; }
+    }
+
+    // Character sprites
+    const passageName = passage.getAttribute("name") || "";
+    const chars = PASSAGE_CHARS[passageName] || [];
+
+    // Re-render sprites (animation resets on each navigation)
+    charLayer.innerHTML = "";
+    for (const charId of chars) {
+      const img = document.createElement("img");
+      img.src = IMG_BASE + "char-" + charId + ".svg";
+      img.alt = charId;
+      img.className = "char-sprite";
+      charLayer.appendChild(img);
     }
   }
 
-  // Run once after initial render
-  setTimeout(applyBackgroundFromPassage, 0);
-
-  // Re-run whenever Twine swaps passages
+  // Run whenever Twine swaps the tw-passage element (direct child only)
   const root = document.querySelector("tw-story") || document.body;
   const obs = new MutationObserver(() => applyBackgroundFromPassage());
-  obs.observe(root, { childList: true, subtree: true });
+  obs.observe(root, { childList: true });
 })();</script><tw-tag name="patientroom" color="green"></tw-tag><tw-tag name="medroom" color="orange"></tw-tag><tw-tag name="hallway" color="orange"></tw-tag><tw-tag name="ending" color="blue"></tw-tag><tw-tag name="station" color="orange"></tw-tag><tw-passagedata pid="1" name="Start" tags="station" position="1225,600" size="100,100">(set: $safety to 0)
 (set: $trust to 0)
 (set: $eff to 0)
@@ -284,7 +361,7 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    You’re starting your shift. Mr. Lee is due for pain medication.
+    Mr. Lee, a post-op patient in Room 4, is due for pain medication. You check the assignment board — he’s yours this shift.
 
     Choose your first move:
 
@@ -302,7 +379,7 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    Chart check: post-op. New pain-med order today. There’s an allergy note.
+    You pull up Mr. Lee’s chart. He’s post-op and there’s a new pain medication order placed this morning. You notice an allergy note flagged in red.
 
     (link: &quot;Read order details&quot;)[
       (set: $safety to $safety + 1)
@@ -505,7 +582,7 @@ a.internalLink.visited:hover {
   &lt;div class=&quot;content&quot;&gt;
     You prep the medication and attempt to scan.
 
-    (link: &quot;Scan succeeds&quot;)[
+    (link: &quot;Scan the medication and proceed&quot;)[
       (goto: &quot;A5&quot;)
     ]
 
@@ -720,7 +797,7 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    You administer without scanning. It’s fast, but risky.
+    You administer the medication without a barcode scan. The medication is in. Mr. Lee looks at you — he doesn’t know anything was skipped.
 
     (link: &quot;Monitor closely and document&quot;)[
       (set: $nearMiss to true)
@@ -744,7 +821,7 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    You notice a wristband detail you didn’t verify earlier.
+    You glance at Mr. Lee’s wristband and realize you never confirmed his ID number against the medication order.
 
     (link: &quot;Stop and verify now&quot;)[
       (set: $safety to (min: 5, $safety + 2))
@@ -767,7 +844,7 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    Your choice increases the risk of a bad reaction or escalation.
+    Mr. Lee's color changes. His breathing has shifted and he's restless. Something isn't right.
 
     (link: &quot;Call rapid response&quot;)[
       (set: $trust to (max: 0, $trust - 1))
@@ -812,7 +889,7 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    &lt;p&gt;&lt;b&gt;End 1 — Safe + Trusted ✅&lt;/b&gt;&lt;/p&gt;
+    &lt;p&gt;&lt;b&gt;Outcome: Safe and Trusted&lt;/b&gt;&lt;/p&gt;
 
     &lt;p&gt;You prevented a near-miss and kept everyone in the loop.&lt;/p&gt;
 
@@ -848,7 +925,7 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    &lt;p&gt;&lt;b&gt;End 3 — Learning Moment 🧠&lt;/b&gt;&lt;/p&gt;
+    &lt;p&gt;&lt;b&gt;Outcome: Learning Moment&lt;/b&gt;&lt;/p&gt;
 
     (if: $harm is true)[
       &lt;p&gt;A reaction risk appeared after skipping a safety step.&lt;/p&gt;
@@ -879,7 +956,7 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    &lt;p&gt;&lt;b&gt;End 2 — Safe + Efficient ✅&lt;/b&gt;&lt;/p&gt;
+    &lt;p&gt;&lt;b&gt;Outcome: Safe and Efficient&lt;/b&gt;&lt;/p&gt;
 
     &lt;p&gt;You kept care moving while still staying safe enough to avoid harm.&lt;/p&gt;
 
@@ -909,11 +986,7 @@ a.internalLink.visited:hover {
   &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="26" name="Result" tags="" position="1650,1600" size="100,100">(set: $ended to true)
 
-(set: $wSafety to 0.45)
-(set: $wTrust to 0.35)
-(set: $wEff to 0.20)
-
-(set: $score to ($safety * $wSafety) + ($trust * $wTrust) + ($eff * $wEff))
+(set: $score to ($safety * 0.45) + ($trust * 0.35) + ($eff * 0.20))
 
 (set: $overTime to ($time &gt;= $timeLimit))
 
@@ -932,7 +1005,7 @@ a.internalLink.visited:hover {
 ]
 (else:)[
   (goto: &quot;End3&quot;)
-]</tw-passagedata><tw-passagedata pid="27" name="A2c" tags="station" position="975,850" size="100,100">(set: $path to $path + &quot;A2c &quot;)
+]</tw-passagedata><tw-passagedata pid="27" name="A2c" tags="patientroom" position="975,850" size="100,100">(set: $path to $path + &quot;A2c &quot;)
 
 &lt;div class=&quot;hud&quot;&gt;
   &lt;div class=&quot;node&quot;&gt;Node: A2c&lt;/div&gt;
@@ -1059,7 +1132,7 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    The order is clarified. Before administering, you decide how thorough to be.
+    The order is corrected. Before giving the medication, you take a breath and think through your next steps.
 
     (link: &quot;Reassess pain, educate, and document&quot;)[
       (set: $trust to $trust + 1)
@@ -1116,9 +1189,9 @@ a.internalLink.visited:hover {
 
 &lt;div class=&quot;scene&quot;&gt;
   &lt;div class=&quot;content&quot;&gt;
-    Everything looks normal at first. The barcode matches the patient wristband.
+    The barcode scan clears. Patient ID confirmed, wristband matches. You load the syringe and prepare to administer.
 
-    (link: &quot;Continue&quot;)[
+    (link: &quot;Administer the medication&quot;)[
       (goto: &quot;A5&quot;)
     ]
   &lt;/div&gt;
