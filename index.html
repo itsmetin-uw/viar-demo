@@ -302,26 +302,34 @@ a.internalLink.visited:hover {
     const tagsAttr = passage.getAttribute("tags") || "";
     const tags = tagsAttr.split(/\s+/).filter(Boolean);
 
-    // Background class
+    // Background class (tags are set immediately when tw-passage is created)
     for (const c of ALL_BG_CLASSES) document.body.classList.remove(c);
     for (const t of tags) {
       const cls = TAG_TO_CLASS[t];
       if (cls) { document.body.classList.add(cls); break; }
     }
 
-    // Character sprites
-    const passageName = passage.getAttribute("name") || "";
-    const chars = PASSAGE_CHARS[passageName] || [];
+    // Characters: Harlowe does NOT set a `name` attribute on tw-passage —
+    // it only sets `tags`. The passage name must be parsed from rendered
+    // text content (e.g. the "Node: B1" div), but that content isn't in
+    // the DOM yet when this observer fires. Delay until Harlowe renders it.
+    setTimeout(function () {
+      const p = document.querySelector("tw-passage");
+      if (!p) return;
+      // Each passage renders: <div class="node">Node: B1</div>
+      const m = (p.textContent || "").match(/Node:\s*([A-Za-z][A-Za-z0-9]*)/);
+      const passageName = m ? m[1] : "";
+      const chars = PASSAGE_CHARS[passageName] || [];
 
-    // Re-render sprites (animation resets on each navigation)
-    charLayer.innerHTML = "";
-    for (const charId of chars) {
-      const img = document.createElement("img");
-      img.src = IMG_BASE + "char-" + charId + ".svg";
-      img.alt = charId;
-      img.className = "char-sprite";
-      charLayer.appendChild(img);
-    }
+      charLayer.innerHTML = "";
+      for (const charId of chars) {
+        const img = document.createElement("img");
+        img.src = IMG_BASE + "char-" + charId + ".svg";
+        img.alt = charId;
+        img.className = "char-sprite";
+        charLayer.appendChild(img);
+      }
+    }, 80);
   }
 
   // Run whenever Twine swaps the tw-passage element (direct child only)
