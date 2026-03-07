@@ -87,15 +87,15 @@ body.bg-ending {
     linear-gradient(#fff0f6, #ffe3ee);
 }
 
-/* Center the UI card */
+/* Position the UI card on the left, leaving right side clear for characters */
 tw-story {
   min-height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 
-  max-width: 920px;
-  margin: 0 auto;
+  max-width: 600px;
+  margin: 0 0 0 5vw;
   padding: 18px;
 
   background: transparent !important;
@@ -143,7 +143,7 @@ tw-story {
 
 /* Glass card (readable + light) */
 tw-passage {
-  width: min(920px, 92vw);
+  width: min(560px, 88vw);
   border-radius: 18px;
   padding: 22px;
 
