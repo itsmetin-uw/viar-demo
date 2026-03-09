@@ -269,6 +269,44 @@ a.internalLink.visited:hover {
   max-height: 60vh;
   overflow-y: auto;
 }
+.glossary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.glossary-close {
+  background: none;
+  border: none;
+  color: #8b5e3c;
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  opacity: 0.6;
+}
+.glossary-close:hover {
+  opacity: 1;
+}
+.glossary-collapsed {
+  position: fixed;
+  top: 52px;
+  right: 16px;
+  padding: 8px 14px;
+  background: rgba(255, 245, 230, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(210,140,90,0.25);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  font-size: 0.78em;
+  color: #8b5e3c;
+  cursor: pointer;
+  z-index: 100;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.glossary-collapsed:hover {
+  background: rgba(255, 245, 230, 0.98);
+}
 .glossary-title {
   font-weight: 800;
   font-size: 0.85em;
@@ -1251,6 +1289,22 @@ h(Math,"asinh",xr.asinh,Math.asinh(1e300)===Infinity);h(Math,"atanh",xr.atanh,Ma
   glossBox.id = 'glossary-container';
   document.body.appendChild(glossBox);
 
+  // Event delegation — handles close/open clicks without getting overwritten
+  glossBox.addEventListener('click', function(e) {
+    var target = e.target;
+    if (target.getAttribute('data-action') === 'close') {
+      e.stopPropagation();
+      glossBox._hidden = true;
+      glossBox._built = false;
+      glossBox.innerHTML = '<div class="glossary-collapsed" data-action="open">Quick Reference ▸</div>';
+    } else if (target.getAttribute('data-action') === 'open') {
+      e.stopPropagation();
+      glossBox._hidden = false;
+      glossBox._built = false;
+      updateUI();
+    }
+  });
+
   var allTerms = {
     'painscale': {label: 'Pain Scale (0–10)', def: '0 = no pain, 10 = worst. 7+ is severe and needs action.'},
     'wristband': {label: 'Wristband / ID Check', def: 'Verify patient identity by checking wristband against the medication order.'},
@@ -1324,18 +1378,37 @@ h(Math,"asinh",xr.asinh,Math.asinh(1e300)===Infinity);h(Math,"atanh",xr.atanh,Ma
 
     // Update glossary — only show terms for this node
     var terms = nodeTerms[nodeName];
-    if (terms && terms.length > 0) {
-      var html = '<div class="glossary"><div class="glossary-title">QUICK REFERENCE</div><dl>';
-      for (var i = 0; i < terms.length; i++) {
-        var t = allTerms[terms[i]];
-        if (t) {
-          html += '<dt>' + t.label + '</dt><dd>' + t.def + '</dd>';
+    
+    // Reset hidden state when passage changes (new screen = fresh glossary)
+    if (nodeName !== glossBox._lastNode) {
+      glossBox._hidden = false;
+      glossBox._lastNode = nodeName;
+      glossBox._built = false;
+    }
+    
+    if (terms && terms.length > 0 && !glossBox._hidden) {
+      if (!glossBox._built || !glossBox.querySelector('.glossary')) {
+        var html = '<div class="glossary"><div class="glossary-header">' +
+          '<div class="glossary-title">QUICK REFERENCE</div>' +
+          '<button class="glossary-close" data-action="close" title="Hide for this screen">✕</button>' +
+          '</div><dl>';
+        for (var i = 0; i < terms.length; i++) {
+          var t = allTerms[terms[i]];
+          if (t) {
+            html += '<dt>' + t.label + '</dt><dd>' + t.def + '</dd>';
+          }
         }
+        html += '</dl></div>';
+        glossBox.innerHTML = html;
+        glossBox._built = true;
       }
-      html += '</dl></div>';
-      glossBox.innerHTML = html;
+    } else if (terms && terms.length > 0 && glossBox._hidden) {
+      if (!glossBox.querySelector('.glossary-collapsed')) {
+        glossBox.innerHTML = '<div class="glossary-collapsed" data-action="open">Quick Reference ▸</div>';
+      }
     } else {
       glossBox.innerHTML = '';
+      glossBox._built = false;
     }
 
     // Update stats
